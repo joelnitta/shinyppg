@@ -5,10 +5,6 @@ library(readr)
 library(DT)
 library(dplyr)
 
-load_data <- function() {
-  read_csv("ppg.csv")
-}
-
 ui <- fluidPage(
   textInput("scientificName", label = "Scientific Name"),
   actionButton("apply", "Apply"),
