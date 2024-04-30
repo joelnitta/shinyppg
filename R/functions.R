@@ -12,5 +12,6 @@ cols_select <- c("taxonID",
 "modified")
 
 load_data <- function() {
-  read_csv("ppg.csv", col_select = any_of(cols_select))
+  url <- "https://raw.githubusercontent.com/pteridogroup/ppg/main/data/ppg.csv"
+  read_csv(url, col_select = any_of(cols_select))
 }
