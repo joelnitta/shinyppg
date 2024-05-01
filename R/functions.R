@@ -2,15 +2,14 @@ dct_terms <- dwctaxon::dct_terms
 
 cols_select <- c(
   "taxonID",
-  "acceptedNameUsageID",
   "scientificName",
   "namePublishedIn",
   "taxonRank",
-  "vernacularName",
   "taxonomicStatus",
   "taxonRemarks",
-  "parentNameUsageID",
+  "acceptedNameUsageID",
   "acceptedNameUsage",
+  "parentNameUsageID",
   "parentNameUsage",
   "modified")
 
