@@ -20,8 +20,9 @@ ppg_app <- function() {
   )
   server <- function(input, output, session) {
     ppg <- reactiveVal(load_data())
+    rows_selected <- reactive(input$results_rows_selected)
     add_row_server("add_row", ppg)
-    modify_row_server("modify_row", ppg)
+    modify_row_server("modify_row", ppg, rows_selected)
     output$results <- DT::renderDT({
       DT::datatable(ppg(), selection = "single")
     })
