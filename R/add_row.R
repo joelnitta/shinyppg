@@ -6,6 +6,7 @@
 #' @param id Character vector of length 1; the ID for
 #' this module.
 #' @returns UI
+#' @noRd
 add_row_ui <- function(id) {
   tagList(
     textInput(NS(id, "scientificName"), label = "Scientific Name"),
@@ -22,6 +23,7 @@ add_row_ui <- function(id) {
 #' this module.
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns Server logic
+#' @noRd
 add_row_server <- function(id, ppg) {
   stopifnot(is.reactive(ppg))
   moduleServer(id, function(input, output, session) {
