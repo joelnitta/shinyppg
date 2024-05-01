@@ -14,8 +14,8 @@
 #' }
 ppg_app <- function() {
   ui <- fluidPage(
-    add_row_ui("add_row"),
-    modify_row_ui("modify_row"),
+    data_entry_ui("add_row"),
+    data_entry_ui("modify_row"),
     DT::dataTableOutput("results", width = 700)
   )
   server <- function(input, output, session) {

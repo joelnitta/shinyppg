@@ -1,19 +1,3 @@
-#' UI for adding a row
-#'
-#' Internal function
-#'
-#' @import shiny
-#' @param id Character vector of length 1; the ID for
-#' this module.
-#' @returns UI
-#' @noRd
-add_row_ui <- function(id) {
-  tagList(
-    textInput(NS(id, "scientificName"), label = "Scientific Name"),
-    actionButton(NS(id, "apply"), "Apply")
-  )
-}
-
 #' Server logic to add a row
 #'
 #' Internal function
