@@ -12,9 +12,19 @@ add_row_server <- function(id, ppg) {
   stopifnot(is.reactive(ppg))
   moduleServer(id, function(input, output, session) {
     observeEvent(input$apply, {
+      # Add one row
       updated_data <- dwctaxon::dct_add_row(
         ppg(),
-        scientificName = input$scientificName
+        taxonID = null_if_blank(input$taxonID),
+        scientificName = null_if_blank(input$scientificName),
+        namePublishedIn = null_if_blank(input$namePublishedIn),
+        taxonRank = null_if_blank(input$taxonRank),
+        taxonomicStatus = null_if_blank(input$taxonomicStatus),
+        taxonRemarks = null_if_blank(input$taxonRemarks),
+        acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
+        acceptedNameUsage = null_if_blank(input$acceptedNameUsage),
+        parentNameUsageID = null_if_blank(input$parentNameUsageID),
+        parentNameUsage = null_if_blank(input$parentNameUsage)
       )
       ppg(updated_data)
     })
