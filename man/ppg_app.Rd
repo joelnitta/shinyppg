@@ -16,7 +16,7 @@ Run a Shiny app to view and edit the Pteridophyte Phylogeny Group (PPG)
 taxonomic database.
 }
 \examples{
-if(interactive()) {
+if (interactive()) {
   ppg_app()
 }
 }

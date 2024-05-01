@@ -9,20 +9,22 @@
 #' browser window.
 #' @export
 #' @examples
-#' if(interactive()) {
+#' if (interactive()) {
 #'   ppg_app()
 #' }
 ppg_app <- function() {
   ui <- fluidPage(
     add_row_ui("add_row"),
+    modify_row_ui("modify_row"),
     DT::dataTableOutput("results", width = 700)
   )
   server <- function(input, output, session) {
     ppg <- reactiveVal(load_data())
     add_row_server("add_row", ppg)
-    output$results <- DT::renderDataTable({
-        ppg()
-      })
+    modify_row_server("modify_row", ppg)
+    output$results <- DT::renderDT({
+      DT::datatable(ppg(), selection = "single")
+    })
   }
   shinyApp(ui, server)
 }
