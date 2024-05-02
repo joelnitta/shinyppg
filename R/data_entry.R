@@ -10,44 +10,54 @@ data_entry_ui <- function(id) {
   tagList(
     textInput(
       NS(id, "taxonID"),
-      label = "Taxon ID"
+      label = "taxonID"
     ),
+    helpText("Taxon ID (advanced)"),
     textInput(
       NS(id, "scientificName"),
-      label = "Scientific name"
+      label = "scientificName"
     ),
+    helpText("Scientific name, including author"),
     textInput(
       NS(id, "namePublishedIn"),
-      label = "Name published in"
+      label = "namePublishedIn"
     ),
+    helpText("Name of publication of taxon"),
     textInput(
       NS(id, "taxonRank"),
-      label = "Taxonomic rank"
+      label = "taxonRank"
     ),
+    helpText("Taxonomic rank"),
     textInput(
       NS(id, "taxonomicStatus"),
-      label = "Taxonomic status"
+      label = "taxonomicStatus"
     ),
+    helpText("Taxonomic status"),
     textInput(
       NS(id, "taxonRemarks"),
-      label = "Taxon remarks"
+      label = "taxonRemarks"
     ),
+    helpText("Notes about taxon"),
     textInput(
       NS(id, "acceptedNameUsageID"),
-      label = "Taxon ID of accepted name"
+      label = "acceptedNameUsageID"
     ),
+    helpText("Taxon ID of accepted name (advanced)"),
     textInput(
       NS(id, "acceptedNameUsage"),
-      label = "Accepted name"
+      label = "acceptedNameUsage"
     ),
+    helpText("Accepted scientific name"),
     textInput(
       NS(id, "parentNameUsageID"),
-      label = "Taxon ID of parent name"
+      label = "parentNameUsageID (advanced)"
     ),
+    helpText("Taxon ID of parent name"),
     textInput(
       NS(id, "parentNameUsage"),
-      label = "Parent name"
+      label = "parentNameUsage"
     ),
+    helpText("Scientific name of parent taxon"),
     actionButton(NS(id, "apply"), "Apply")
   )
 }

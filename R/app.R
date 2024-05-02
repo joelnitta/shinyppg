@@ -14,10 +14,26 @@
 #' }
 ppg_app <- function() {
   ui <- fluidPage(
-    data_entry_ui("add_row"),
-    data_entry_ui("modify_row"),
-    delete_row_ui("delete_row"),
-    DT::dataTableOutput("results", width = 700)
+    titlePanel("PPG Editor"),
+    sidebarLayout(
+      sidebarPanel(
+        tabsetPanel(
+          tabPanel(
+            "Add row",
+            data_entry_ui("add_row")
+          ),
+          tabPanel(
+            "Edit row",
+            data_entry_ui("modify_row")
+          )
+        ),
+        hr(),
+        delete_row_ui("delete_row")
+      ),
+      mainPanel(
+        DT::dataTableOutput("results", width = 700)
+      )
+    )
   )
   server <- function(input, output, session) {
     ppg <- reactiveVal(load_data())
