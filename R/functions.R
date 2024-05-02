@@ -38,3 +38,34 @@ null_if_blank <- function(x) {
   if (x == "") return(NULL)
   x
 }
+
+#' Reset text in a data entry box to empty (`""`)
+#'
+#' Internal function
+#'
+#' @param session Passed to updateTextInput
+#' @param item Name of text input to reset
+#' @noRd
+reset_data_entry <- function(session, item) {
+  shiny::updateTextInput(
+    session,
+    item,
+    value = ""
+  )
+}
+
+#' Set text in a data entry box to the value from a selected row
+#'
+#' Internal function
+#'
+#' @param session Passed to updateTextInput
+#' @param item Name of text input to reset
+#' @param selected_row Dataframe with one row; selected row of data from PPG
+#' @noRd
+fill_data_entry_from_row <- function(session, item, selected_row) {
+  shiny::updateTextInput(
+    session,
+    item,
+    value = selected_row[[item]]
+  )
+}

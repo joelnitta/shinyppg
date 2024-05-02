@@ -27,8 +27,9 @@ ppg_app <- function() {
     delete_row_server("delete_row", ppg, rows_selected)
     output$results <- DT::renderDT({
       DT::datatable(ppg(),
-      filter = "top",
-      selection = "multiple")
+        filter = "top",
+        selection = "multiple"
+      )
     })
   }
   shinyApp(ui, server)

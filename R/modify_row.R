@@ -35,55 +35,27 @@ modify_row_server <- function(id, ppg, rows_selected) {
     observeEvent(rows_selected(), {
       if (length(rows_selected()) == 1) {
         selected_row <- ppg()[rows_selected(), ]
-        updateTextInput(
-          session,
-          "taxonID",
-          value = selected_row$taxonID
+        purrr::walk(
+          cols_select,
+          ~fill_data_entry_from_row(
+            session = session,
+            item = .x,
+            selected_row = selected_row
+          )
         )
-        updateTextInput(
-          session,
-          "scientificName",
-          value = selected_row$scientificName
-        )
-        updateTextInput(
-          session,
-          "namePublishedIn",
-          value = selected_row$namePublishedIn
-        )
-        updateTextInput(
-          session,
-          "taxonRank",
-          value = selected_row$taxonRank
-        )
-        updateTextInput(
-          session,
-          "taxonomicStatus",
-          value = selected_row$taxonomicStatus
-        )
-        updateTextInput(
-          session,
-          "taxonRemarks",
-          value = selected_row$taxonRemarks
-        )
-        updateTextInput(
-          session,
-          "acceptedNameUsageID",
-          value = selected_row$acceptedNameUsageID
-        )
-        updateTextInput(
-          session,
-          "acceptedNameUsage",
-          value = selected_row$acceptedNameUsage
-        )
-        updateTextInput(
-          session,
-          "parentNameUsageID",
-          value = selected_row$parentNameUsageID
-        )
-        updateTextInput(
-          session,
-          "parentNameUsage",
-          value = selected_row$parentNameUsage
+      }
+    })
+    # Reset row editing text boxes when zero or >1 rows selected
+    mult_or_no_rows_selected <- reactive({
+      is.null(rows_selected()) ||
+        length(rows_selected()) == 0 ||
+        length(rows_selected()) > 1
+    })
+    observeEvent(mult_or_no_rows_selected(), {
+      if (mult_or_no_rows_selected()) {
+        purrr::walk(
+          cols_select,
+          ~reset_data_entry(session = session, item = .x)
         )
       }
     })
