@@ -1,17 +1,18 @@
 dct_terms <- dwctaxon::dct_terms
 
 cols_select <- c(
-  "taxonID",
   "scientificName",
-  "namePublishedIn",
   "taxonRank",
   "taxonomicStatus",
+  "namePublishedIn",
   "taxonRemarks",
-  "acceptedNameUsageID",
   "acceptedNameUsage",
-  "parentNameUsageID",
   "parentNameUsage",
-  "modified")
+  "taxonID",
+  "acceptedNameUsageID",
+  "parentNameUsageID",
+  "modified"
+)
 
 #' Load data
 #'
@@ -35,7 +36,9 @@ load_data <- function() {
 #' @noRd
 null_if_blank <- function(x) {
   stopifnot(length(x) == 1)
-  if (x == "") return(NULL)
+  if (x == "") {
+    return(NULL)
+  }
   x
 }
 
