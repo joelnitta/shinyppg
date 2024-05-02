@@ -33,7 +33,7 @@ modify_row_server <- function(id, ppg, rows_selected) {
     })
     # Fill in row editing text boxes with data from selected row
     observeEvent(rows_selected(), {
-      if (length(rows_selected()) > 0) {
+      if (length(rows_selected()) == 1) {
         selected_row <- ppg()[rows_selected(), ]
         updateTextInput(
           session,

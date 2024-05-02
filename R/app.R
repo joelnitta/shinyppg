@@ -16,6 +16,7 @@ ppg_app <- function() {
   ui <- fluidPage(
     data_entry_ui("add_row"),
     data_entry_ui("modify_row"),
+    delete_row_ui("delete_row"),
     DT::dataTableOutput("results", width = 700)
   )
   server <- function(input, output, session) {
@@ -23,8 +24,11 @@ ppg_app <- function() {
     rows_selected <- reactive(input$results_rows_selected)
     add_row_server("add_row", ppg)
     modify_row_server("modify_row", ppg, rows_selected)
+    delete_row_server("delete_row", ppg, rows_selected)
     output$results <- DT::renderDT({
-      DT::datatable(ppg(), selection = "single")
+      DT::datatable(ppg(),
+      filter = "top",
+      selection = "multiple")
     })
   }
   shinyApp(ui, server)
