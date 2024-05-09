@@ -70,6 +70,7 @@ data_entry_ui <- function(id) {
       label = "parentNameUsageID"
     ),
     helpText("Taxon ID of parent name (advanced)"),
-    actionButton(NS(id, "apply"), "Apply")
+    actionButton(NS(id, "apply"), "Apply"),
+    textOutput(NS(id, "error_msg"))
   )
 }

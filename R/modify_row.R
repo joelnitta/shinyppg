@@ -14,23 +14,36 @@ modify_row_server <- function(id, ppg, rows_selected) {
   stopifnot(is.reactive(rows_selected))
 
   moduleServer(id, function(input, output, session) {
+
+    # initiate error message
+    error_msg <- reactiveVal("")
+
     # Modify one row
     observeEvent(input$apply, {
-      updated_data <- dwctaxon::dct_modify_row(
-        ppg(),
-        taxonID = null_if_blank(input$taxonID),
-        scientificName = null_if_blank(input$scientificName),
-        namePublishedIn = null_if_blank(input$namePublishedIn),
-        taxonRank = null_if_blank(input$taxonRank),
-        taxonomicStatus = null_if_blank(input$taxonomicStatus),
-        taxonRemarks = null_if_blank(input$taxonRemarks),
-        acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
-        acceptedNameUsage = null_if_blank(input$acceptedNameUsage),
-        parentNameUsageID = null_if_blank(input$parentNameUsageID),
-        parentNameUsage = null_if_blank(input$parentNameUsage)
-      )
-      ppg(updated_data)
+      # Reset error message each time apply is clicked
+      error_msg("")
+      # Catch errors when modifying
+      tryCatch({
+        updated_data <- dwctaxon::dct_modify_row(
+          ppg(),
+          taxonID = null_if_blank(input$taxonID),
+          scientificName = null_if_blank(input$scientificName),
+          namePublishedIn = null_if_blank(input$namePublishedIn),
+          taxonRank = null_if_blank(input$taxonRank),
+          taxonomicStatus = null_if_blank(input$taxonomicStatus),
+          taxonRemarks = null_if_blank(input$taxonRemarks),
+          acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
+          acceptedNameUsage = null_if_blank(input$acceptedNameUsage),
+          parentNameUsageID = null_if_blank(input$parentNameUsageID),
+          parentNameUsage = null_if_blank(input$parentNameUsage)
+        )
+        ppg(updated_data)
+      }, error = function(e) {
+        error_msg(paste("Error:", e$message))
+      })
+      output$error_msg <- renderText(error_msg())
     })
+
     # Fill in row editing text boxes with data from selected row
     observeEvent(rows_selected(), {
       if (length(rows_selected()) == 1) {
@@ -45,6 +58,7 @@ modify_row_server <- function(id, ppg, rows_selected) {
         )
       }
     })
+
     # Reset row editing text boxes when zero or >1 rows selected
     mult_or_no_rows_selected <- reactive({
       is.null(rows_selected()) ||
