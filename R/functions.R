@@ -23,7 +23,7 @@ cols_select <- c(
 #' @return Tibble
 #' @noRd
 load_data <- function() {
-  url <- "https://raw.githubusercontent.com/pteridogroup/ppg/main/data/ppg.csv"
+  url <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
   readr::read_csv(url, col_select = dplyr::any_of(cols_select))
 }
 
