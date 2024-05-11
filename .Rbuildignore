@@ -3,3 +3,4 @@
 \.Rprofile$
 ^rsconnect$
 ^app\.R$
+^shiny-run\.R$
