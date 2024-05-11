@@ -23,7 +23,6 @@ validate_ui <- function(id) {
 #' @returns Server logic
 #' @noRd
 validate_server <- function(id, ppg) {
-
   # Check args
   stopifnot(is.reactive(ppg))
 

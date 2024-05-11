@@ -35,7 +35,7 @@ ppg_app <- function() {
               delete_row_ui("delete_row")
             ),
             mainPanel(
-              DT::dataTableOutput("results", width = 700)
+              display_ppg_ui("display_ppg")
             )
           )
         }
@@ -45,17 +45,11 @@ ppg_app <- function() {
     ),
   )
   server <- function(input, output, session) {
-    ppg <- reactiveVal(load_data())
-    rows_selected <- reactive(input$results_rows_selected)
+    ppg <- load_data_server("ppg")
+    rows_selected <- display_ppg_server("display_ppg", ppg)
     add_row_server("add_row", ppg)
     modify_row_server("modify_row", ppg, rows_selected)
     delete_row_server("delete_row", ppg, rows_selected)
-    output$results <- DT::renderDT({
-      DT::datatable(ppg(),
-        filter = "top",
-        selection = "multiple"
-      )
-    })
     validate_server("validate", ppg)
   }
   shinyApp(ui, server)
