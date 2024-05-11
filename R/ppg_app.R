@@ -15,25 +15,34 @@
 ppg_app <- function() {
   ui <- fluidPage(
     titlePanel("PPG Editor"),
-    sidebarLayout(
-      sidebarPanel(
-        tabsetPanel(
-          tabPanel(
-            "Add row",
-            data_entry_ui("add_row")
-          ),
-          tabPanel(
-            "Edit row",
-            data_entry_ui("modify_row")
+    tabsetPanel(
+      tabPanel(
+        "Data Entry",
+        {
+          sidebarLayout(
+            sidebarPanel(
+              tabsetPanel(
+                tabPanel(
+                  "Add row",
+                  data_entry_ui("add_row")
+                ),
+                tabPanel(
+                  "Edit row",
+                  data_entry_ui("modify_row")
+                )
+              ),
+              hr(),
+              delete_row_ui("delete_row")
+            ),
+            mainPanel(
+              DT::dataTableOutput("results", width = 700)
+            )
           )
-        ),
-        hr(),
-        delete_row_ui("delete_row")
+        }
       ),
-      mainPanel(
-        DT::dataTableOutput("results", width = 700)
-      )
-    )
+      tabPanel("Data Validation", validate_ui("validate")),
+      tabPanel("Settings")
+    ),
   )
   server <- function(input, output, session) {
     ppg <- reactiveVal(load_data())
@@ -47,6 +56,7 @@ ppg_app <- function() {
         selection = "multiple"
       )
     })
+    validate_server("validate", ppg)
   }
   shinyApp(ui, server)
 }
