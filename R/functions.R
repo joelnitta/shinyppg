@@ -72,3 +72,11 @@ fill_data_entry_from_row <- function(session, item, selected_row) {
     value = selected_row[[item]]
   )
 }
+
+#' Not used here, but needed to pass R CMD CHECK since we use
+#' pkgload::load_all() in ./app.R
+#'
+#' @noRd
+pkgload_load_all <- function(...) {
+  pkgload::load_all(...)
+}

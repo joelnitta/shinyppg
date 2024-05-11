@@ -1,0 +1,10 @@
+name: shinyppg
+title:
+username: fernphy
+account: fernphy
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 11974314
+bundleId: 8598767
+url: https://fernphy.shinyapps.io/shinyppg/
+version: 1

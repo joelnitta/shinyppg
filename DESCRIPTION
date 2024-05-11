@@ -17,6 +17,7 @@ Imports:
     dplyr,
     DT,
     dwctaxon,
+    pkgload,
     purrr,
     readr,
     shiny
