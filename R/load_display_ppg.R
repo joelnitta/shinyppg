@@ -9,7 +9,7 @@
 #' @noRd
 display_ppg_ui <- function(id) {
   tagList(
-    reactable::reactableOutput(NS(id, "ppg_table"), width = 700)
+    reactable::reactableOutput(NS(id, "ppg_table"), width = "100%")
   )
 }
 
@@ -46,6 +46,7 @@ display_ppg_server <- function(id, ppg) {
         filterable = TRUE,
         searchable = TRUE,
         selection = "multiple",
+        resizable = TRUE,
         fullWidth = TRUE
       )
     })
