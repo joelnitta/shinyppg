@@ -41,7 +41,13 @@ ppg_app <- function() {
         }
       ),
       tabPanel("Data Validation", validate_ui("validate")),
-      tabPanel("Settings")
+      tabPanel(
+        "Settings",
+        {
+          mainPanel(
+            settings_table_ui("settings_module", cols_select)
+          )
+        })
     ),
   )
   server <- function(input, output, session) {
@@ -51,6 +57,8 @@ ppg_app <- function() {
     modify_row_server("modify_row", ppg, rows_selected)
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
+    settings <- reactiveVal(cols_select)
+    settings_table_server("settings_module", settings)
   }
   shinyApp(ui, server)
 }

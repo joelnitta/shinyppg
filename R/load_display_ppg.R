@@ -42,12 +42,17 @@ display_ppg_server <- function(id, ppg) {
 
   moduleServer(id, function(input, output, session) {
     output$ppg_table <- reactable::renderReactable({
-      reactable::reactable(ppg(),
+      reactable::reactable(
+        ppg(),
         filterable = TRUE,
         searchable = TRUE,
         selection = "multiple",
         resizable = TRUE,
-        fullWidth = TRUE
+        fullWidth = TRUE,
+        columns = list(
+          modified = reactable::colDef(defaultSortOrder = "desc")
+        ),
+        defaultSorted = c("modified", "scientificName")
       )
     })
     selected_rows <- reactive(

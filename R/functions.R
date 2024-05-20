@@ -32,6 +32,11 @@ valid_tax_rank <- c(
   "variety"
 )
 
+settings_data <- data.frame(
+  Setting = cols_select,
+  Ascending = TRUE
+)
+
 #' Load data
 #'
 #' Loads the most recent PPG dataset
