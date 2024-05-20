@@ -20,10 +20,16 @@ cols_select <- c(
 #'
 #' Internal function
 #'
+#' @param data_source Where to get the data. If 'local', data will be read from
+#' saved data file in ./data. Otherwise, data will be downloaded.
+#'
 #' @return Tibble
 #' @noRd
-load_data <- function() {
+load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
   url <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
+  if (data_source == "local") {
+    return(shinyppg::ppg_small)
+  }
   readr::read_csv(url, col_select = dplyr::any_of(cols_select))
 }
 

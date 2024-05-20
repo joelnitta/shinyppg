@@ -4,3 +4,4 @@
 ^rsconnect$
 ^app\.R$
 ^shiny-run\.R$
+^data-raw$
