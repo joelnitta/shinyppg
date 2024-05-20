@@ -14,6 +14,24 @@ cols_select <- c(
   "modified"
 )
 
+valid_tax_status <- c(
+  "accepted",
+  "synonym",
+  "ambiguous synonym"
+)
+
+valid_tax_rank <- c(
+  "species",
+  "genus",
+  "tribe",
+  "subfamily",
+  "family",
+  "order",
+  "form",
+  "subspecies",
+  "variety"
+)
+
 #' Load data
 #'
 #' Loads the most recent PPG dataset

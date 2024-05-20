@@ -15,15 +15,17 @@ data_entry_ui <- function(id) {
     ),
     helpText("Scientific name, including author"),
     # taxonRank
-    textInput(
+    selectInput(
       NS(id, "taxonRank"),
-      label = "taxonRank"
+      label = "taxonRank",
+      valid_tax_rank
     ),
     helpText("Taxonomic rank"),
     # taxonomicStatus
-    textInput(
+    selectInput(
       NS(id, "taxonomicStatus"),
-      label = "taxonomicStatus"
+      label = "taxonomicStatus",
+      valid_tax_status
     ),
     helpText("Taxonomic status"),
     # namePublishedIn
