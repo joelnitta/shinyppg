@@ -1,4 +1,3 @@
-
 #' UI to display PPG
 #'
 #' Internal function
@@ -9,7 +8,8 @@
 #' @noRd
 display_ppg_ui <- function(id) {
   tagList(
-    reactable::reactableOutput(NS(id, "ppg_table"), width = "100%")
+    reactable::reactableOutput(NS(id, "ppg_table"), width = "100%"),
+    textOutput(NS(id, "selected_rows_message"))
   )
 }
 
@@ -50,6 +50,13 @@ display_ppg_server <- function(id, ppg) {
         fullWidth = TRUE
       )
     })
-    reactive(reactable::getReactableState("ppg_table", "selected"))
+    selected_rows <- reactive(
+      reactable::getReactableState("ppg_table", "selected")
+    )
+    output$selected_rows_message <- renderText({
+      num_selected <- length(selected_rows())
+      paste("Number of rows selected:", num_selected)
+    })
+    selected_rows
   })
 }
