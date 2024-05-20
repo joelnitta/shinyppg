@@ -9,7 +9,7 @@
 #' @noRd
 display_ppg_ui <- function(id) {
   tagList(
-    DT::dataTableOutput(NS(id, "ppg_table"), width = 700)
+    reactable::reactableOutput(NS(id, "ppg_table"), width = 700)
   )
 }
 
@@ -41,12 +41,14 @@ display_ppg_server <- function(id, ppg) {
   stopifnot(is.reactive(ppg))
 
   moduleServer(id, function(input, output, session) {
-    output$ppg_table <- DT::renderDT({
-      DT::datatable(ppg(),
-        filter = "top",
-        selection = "multiple"
+    output$ppg_table <- reactable::renderReactable({
+      reactable::reactable(ppg(),
+        filterable = TRUE,
+        searchable = TRUE,
+        selection = "multiple",
+        fullWidth = TRUE
       )
     })
-    reactive(input$ppg_table_rows_selected)
+    reactive(reactable::getReactableState("ppg_table", "selected"))
   })
 }
