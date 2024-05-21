@@ -73,6 +73,76 @@ load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
   readr::read_csv(url, col_select = dplyr::any_of(cols_select))
 }
 
+#' Load IPNI authors
+#'
+#' Internal function
+#'
+#' @return Character vector
+#' @noRd
+load_authors <- function() {
+  shinyppg::ipni_authors
+}
+
+#' Load higher names of pteridophytes
+#'
+#' Internal function
+#'
+#' @return Character vector
+#' @noRd
+load_pterido_higher_names <- function() {
+  shinyppg::pterido_higher_names
+}
+
+#' Load specific epithets of pteridophytes
+#'
+#' Internal function
+#'
+#' @return Character vector
+#' @noRd
+load_pterido_sp_epithets <- function() {
+  shinyppg::pterido_sp_epithets
+}
+
+#' updateSelectizeInput for compose_name_server()
+#'
+#' Internal function
+#'
+#' @param session The session object passed to function given to shinyServer
+#' @param inputId The id of the input object.
+#' @param choices Selection choices to include in the selectize input
+#' @param placeholder Text to display before selection is made.
+#' @return Output of updateSelectizeInput()
+#' @noRd
+update_selectize_compose_name <- function(
+    session, inputId, choices, placeholder) {
+  updateSelectizeInput(
+    session = session,
+    inputId = inputId,
+    choices = choices,
+    selected = "",
+    server = TRUE,
+    options = list(
+      placeholder = placeholder,
+      onInitialize = I('function() { this.setValue(""); }')
+    )
+  )
+}
+
+#' Check if multiple, or zero, rows are selected
+#'
+#' Internal function
+#'
+#' @param rows_selected A reactive value: currently selected rows
+#' @return A reactive value
+#' @noRd
+check_mult_or_no_rows_selected <- function(rows_selected) {
+  reactive({
+    is.null(rows_selected()) ||
+      length(rows_selected()) == 0 ||
+      length(rows_selected()) > 1
+  })
+}
+
 #' Convert values of `""` to NULL
 #'
 #' Internal function

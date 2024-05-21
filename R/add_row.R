@@ -8,8 +8,10 @@
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns Server logic
 #' @noRd
-add_row_server <- function(id, ppg) {
+add_row_server <- function(id, ppg, composed_name) {
   stopifnot(is.reactive(ppg))
+  stopifnot(is.reactive(composed_name))
+
   moduleServer(id, function(input, output, session) {
 
     # initiate error message
@@ -25,7 +27,7 @@ add_row_server <- function(id, ppg) {
         updated_data <- dwctaxon::dct_add_row(
           ppg(),
           taxonID = null_if_blank(input$taxonID),
-          scientificName = null_if_blank(input$scientificName),
+          scientificName = null_if_blank(composed_name()),
           namePublishedIn = null_if_blank(input$namePublishedIn),
           taxonRank = null_if_blank(input$taxonRank),
           taxonomicStatus = null_if_blank(input$taxonomicStatus),

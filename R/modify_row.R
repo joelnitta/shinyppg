@@ -7,11 +7,12 @@
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns Server logic
 #' @noRd
-modify_row_server <- function(id, ppg, rows_selected) {
+modify_row_server <- function(id, ppg, rows_selected, composed_name) {
 
   # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
+  stopifnot(is.reactive(composed_name))
 
   moduleServer(id, function(input, output, session) {
 
@@ -27,7 +28,7 @@ modify_row_server <- function(id, ppg, rows_selected) {
         updated_data <- dwctaxon::dct_modify_row(
           ppg(),
           taxonID = null_if_blank(input$taxonID),
-          scientificName = null_if_blank(input$scientificName),
+          scientificName = null_if_blank(composed_name()),
           namePublishedIn = null_if_blank(input$namePublishedIn),
           taxonRank = null_if_blank(input$taxonRank),
           taxonomicStatus = null_if_blank(input$taxonomicStatus),
@@ -60,11 +61,7 @@ modify_row_server <- function(id, ppg, rows_selected) {
     })
 
     # Reset row editing text boxes when zero or >1 rows selected
-    mult_or_no_rows_selected <- reactive({
-      is.null(rows_selected()) ||
-        length(rows_selected()) == 0 ||
-        length(rows_selected()) > 1
-    })
+    mult_or_no_rows_selected <- check_mult_or_no_rows_selected(rows_selected)
     observeEvent(mult_or_no_rows_selected(), {
       if (mult_or_no_rows_selected()) {
         purrr::walk(
