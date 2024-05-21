@@ -32,6 +32,28 @@ valid_tax_rank <- c(
   "variety"
 )
 
+#' Convert output of reactable::getReactableState() for column sorting to
+#' format that can be used to specify column sort order.
+#'
+#' The output of this function can be used as input to the `columns` arg
+#' of reactable::reactable()
+#'
+#' Internal function
+#'
+#' @param col_list Output of reactable::getReactableState(name = "sorted"):
+#' a named list of columns with values of "asc" for ascending order or "desc"
+#' for descending order, or NULL if no columns are sorted
+#'
+#' @return list
+#' @noRd
+set_asc_desc <- function(col_list) {
+  res <- col_list
+  for (i in seq_along(col_list)) {
+    res[[i]] <- reactable::colDef(defaultSortOrder = col_list[[i]])
+  }
+  res
+}
+
 #' Load data
 #'
 #' Loads the most recent PPG dataset

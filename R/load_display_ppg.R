@@ -34,22 +34,49 @@ load_data_server <- function(id) {
 #' @import shiny
 #' @param id Character vector of length 1; the ID for this module.
 #' @param ppg Reactive dataframe (tibble) of PPG data
-#' @returns Server logic
+#' @returns List of metadata about current table
 #' @noRd
 display_ppg_server <- function(id, ppg) {
   # Check args
   stopifnot(is.reactive(ppg))
 
   moduleServer(id, function(input, output, session) {
+
+    # Define default settings for column sorting
+    default_columns <- list(
+      modified = reactable::colDef(defaultSortOrder = "desc")
+    )
+    default_sorted <- c("modified", "scientificName")
+    # Make reactive
+    columns_state <- reactiveVal(default_columns)
+    sorted_state <- reactiveVal(default_sorted)
+
     output$ppg_table <- reactable::renderReactable({
-      reactable::reactable(ppg(),
+      reactable::reactable(
+        ppg(),
         filterable = TRUE,
         searchable = TRUE,
         selection = "multiple",
         resizable = TRUE,
-        fullWidth = TRUE
+        fullWidth = TRUE,
+        columns = columns_state(),
+        defaultSorted = sorted_state()
       )
     })
+
+    # Update column sorting so we don't lose it when the table gets re-created
+    current_sorted <- reactive(
+      reactable::getReactableState("ppg_table", "sorted")
+    )
+    observe({
+      current_sorted_names <- names(current_sorted())
+      current_sorted_asc_desc <- set_asc_desc(current_sorted())
+      if (!is.null(current_sorted_names)) {
+        sorted_state(current_sorted_names)
+        columns_state(current_sorted_asc_desc)
+      }
+    })
+
     selected_rows <- reactive(
       reactable::getReactableState("ppg_table", "selected")
     )
@@ -57,6 +84,6 @@ display_ppg_server <- function(id, ppg) {
       num_selected <- length(selected_rows())
       paste("Number of rows selected:", num_selected)
     })
-    selected_rows
+    return(selected_rows)
   })
 }
