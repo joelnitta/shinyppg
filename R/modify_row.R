@@ -19,6 +19,16 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
     # initiate error message
     error_msg <- reactiveVal("")
 
+    parentNameUsage <- autocomplete_server(
+      id = "parentNameUsage",
+      ppg = ppg,
+      rows_selected = rows_selected,
+      placeholder = "Select parent name",
+      col_select = "parentNameUsage",
+      fill_name = TRUE,
+      !taxonRank %in% c("form", "subspecies", "variety")
+    )
+
     # Modify one row
     observeEvent(input$apply, {
       # Reset error message each time apply is clicked
@@ -36,7 +46,7 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
           acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
           acceptedNameUsage = null_if_blank(input$acceptedNameUsage),
           parentNameUsageID = null_if_blank(input$parentNameUsageID),
-          parentNameUsage = null_if_blank(input$parentNameUsage)
+          parentNameUsage = null_if_blank(parentNameUsage())
         )
         ppg(updated_data)
       }, error = function(e) {

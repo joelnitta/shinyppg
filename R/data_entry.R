@@ -34,12 +34,11 @@ data_entry_ui <- function(id) {
       NS(id, "acceptedNameUsage"),
       label = "acceptedNameUsage"
     ),
-    helpText("Accepted scientific name"),
-    textInput(
+    autocomplete_ui(
       NS(id, "parentNameUsage"),
-      label = "parentNameUsage"
+      col_select = "parentNameUsage",
+      help_text = "Scientific name of parent taxon"
     ),
-    helpText("Scientific name of parent taxon"),
     textInput(
       NS(id, "taxonID"),
       label = "taxonID"

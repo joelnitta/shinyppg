@@ -1,5 +1,9 @@
+# Define vectors used in the app
+
+# Valide Darwin Core (DwC) Taxon terms (columns)
 dct_terms <- dwctaxon::dct_terms
 
+# Columns to display in the main ppg dataframe
 cols_select <- c(
   "scientificName",
   "taxonRank",
@@ -14,12 +18,14 @@ cols_select <- c(
   "modified"
 )
 
+# Valid values to use for taxonomicStatus
 valid_tax_status <- c(
   "accepted",
   "synonym",
   "ambiguous synonym"
 )
 
+# Valid values to use for taxonomicRank
 valid_tax_rank <- c(
   "species",
   "genus",
@@ -195,4 +201,29 @@ fill_data_entry_from_row <- function(session, item, selected_row) {
 #' @noRd
 pkgload_load_all <- function(...) {
   pkgload::load_all(...)
+}
+
+#' Initialize a select menu of input items
+#'
+#' Internal function used in autocomplete_server()
+#'
+#' @param session
+#' @param choices Input choices
+#' @param placeholder Default value to display
+#' @param selected Value to select
+#'
+#' @noRd
+initialize_selectize_input <- function(
+    session, choices, placeholder, selected) {
+  updateSelectizeInput(
+    session,
+    inputId = "autocomp_col",
+    choices = choices,
+    selected = selected,
+    server = TRUE,
+    options = list(
+      placeholder = placeholder,
+      onInitialize = I('function() { this.setValue(""); }')
+    )
+  )
 }

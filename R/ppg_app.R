@@ -65,10 +65,14 @@ ppg_app <- function() {
     compose_name_server(
       "sci_name_modify", higher_names, epithets, ipni_authors,
       composed_name_modify, ppg, rows_selected, fill_sci_name = TRUE)
-    add_row_server("add_row", ppg, composed_name_add)
+    add_row_server(
+      "add_row",
+      ppg,
+      composed_name_add,
+      rows_selected)
     modify_row_server("modify_row", ppg, rows_selected, composed_name_modify)
     delete_row_server("delete_row", ppg, rows_selected)
-    validate_server("validate", ppg)
+    validate_server("validate", ppg) 
   }
   shinyApp(ui, server)
 }
