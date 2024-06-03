@@ -20,6 +20,16 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
     # initiate error message
     error_msg <- reactiveVal("")
 
+    acceptedNameUsage <- autocomplete_server(
+      id = "acceptedNameUsage",
+      ppg = ppg,
+      rows_selected = rows_selected,
+      placeholder = "Select parent name",
+      col_select = "acceptedNameUsage",
+      fill_name = TRUE,
+      TRUE
+    )
+
     parentNameUsage <- autocomplete_server(
       id = "parentNameUsage",
       ppg = ppg,
@@ -45,7 +55,7 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
           taxonomicStatus = null_if_blank(input$taxonomicStatus),
           taxonRemarks = null_if_blank(input$taxonRemarks),
           acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
-          acceptedNameUsage = null_if_blank(input$acceptedNameUsage),
+          acceptedNameUsage = null_if_blank(acceptedNameUsage()),
           parentNameUsageID = null_if_blank(input$parentNameUsageID),
           parentNameUsage = null_if_blank(parentNameUsage())
         )

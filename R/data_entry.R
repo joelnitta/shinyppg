@@ -30,9 +30,10 @@ data_entry_ui <- function(id) {
       label = "taxonRemarks"
     ),
     helpText("Notes about taxon"),
-    textInput(
+    autocomplete_ui(
       NS(id, "acceptedNameUsage"),
-      label = "acceptedNameUsage"
+      col_select = "acceptedNameUsage",
+      help_text = "Accepted scientific name"
     ),
     autocomplete_ui(
       NS(id, "parentNameUsage"),
