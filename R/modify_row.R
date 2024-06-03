@@ -6,6 +6,7 @@
 #' @param id Character vector of length 1; the ID for this module.
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns Server logic
+#' @autoglobal
 #' @noRd
 modify_row_server <- function(id, ppg, rows_selected, composed_name) {
 

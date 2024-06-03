@@ -8,6 +8,7 @@
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @param rows_selected A reactive value: currently selected rows
 #' @returns Server logic
+#' @autoglobal
 #' @noRd
 add_row_server <- function(id, ppg, composed_name, rows_selected) {
   stopifnot(is.reactive(ppg))

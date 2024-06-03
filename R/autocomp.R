@@ -40,6 +40,7 @@ autocomplete_ui <- function(id, col_select, help_text) {
 #'   to only the rows that should be used for providing items in the selectize
 #'   menu
 #' @returns Server logic
+#' @autoglobal
 #' @noRd
 autocomplete_server <- function(
     id, ppg, rows_selected,
@@ -99,12 +100,18 @@ autocomplete_server <- function(
   })
 }
 
-# Test app
+#' Simple app for testing
+#'
+#'  internal function
+#'
+#' @import shiny
+#' @autoglobal
+#' @noRd
 autocomplete_app <- function() {
   ui <- fluidPage(
     autocomplete_ui(
       id = "parentNameUsage",
-      col = "parentNameUsage",
+      col_select = "parentNameUsage",
       help_text = "Scientific name of parent taxon"
     ),
     textOutput("result")

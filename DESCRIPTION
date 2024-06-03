@@ -11,7 +11,8 @@ Description: Provides a Shiny app to manage Pteridophyte Phylogeny Group (PPG)
   data.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Roxygen: list(markdown = TRUE)
+Roxygen: list(markdown = TRUE, roclets = c("collate", "namespace", "rd",
+    "roxyglobals::global_roclet"))
 RoxygenNote: 7.3.1
 Imports: 
     dplyr,
@@ -26,4 +27,9 @@ Depends:
     R (>= 2.10)
 LazyData: true
 Suggests: 
-    assertr
+    assertr,
+    roxyglobals,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxyglobals/filename: globals.R
+Config/roxyglobals/unique: FALSE
