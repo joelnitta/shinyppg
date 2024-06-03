@@ -207,7 +207,7 @@ pkgload_load_all <- function(...) {
 #'
 #' Internal function used in autocomplete_server()
 #'
-#' @param session
+#' @param session Current session
 #' @param choices Input choices
 #' @param placeholder Default value to display
 #' @param selected Value to select
