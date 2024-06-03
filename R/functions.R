@@ -1,4 +1,4 @@
-# Define vectors used in the app
+# Define vectors used in the app ----
 
 # Valide Darwin Core (DwC) Taxon terms (columns)
 dct_terms <- dwctaxon::dct_terms
@@ -36,6 +36,13 @@ valid_tax_rank <- c(
   "form",
   "subspecies",
   "variety"
+)
+
+# Define validation settings ----
+
+dwctaxon::dct_options(
+  check_sci_name = FALSE,
+  valid_tax_status = paste(valid_tax_status, collapse = ", ")
 )
 
 #' Convert output of reactable::getReactableState() for column sorting to
@@ -225,5 +232,27 @@ initialize_selectize_input <- function(
       placeholder = placeholder,
       onInitialize = I('function() { this.setValue(""); }')
     )
+  )
+}
+
+#' Check if PPG data are valid or not, and return either TRUE or FALSE
+#' but no error
+#'
+#' @param ppg PPG dataframe
+#'
+#' @noRd
+initial_validate <- function(ppg) {
+  tryCatch(
+    {
+      res <- dwctaxon::dct_validate(
+        ppg,
+        on_success = "logical",
+        on_fail = "error"
+      )
+      return(res)
+    },
+    error = function(e) {
+      return(FALSE)
+    }
   )
 }
