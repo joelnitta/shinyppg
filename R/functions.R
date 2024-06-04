@@ -22,7 +22,8 @@ cols_select <- c(
 valid_tax_status <- c(
   "accepted",
   "synonym",
-  "ambiguous synonym"
+  "ambiguous synonym",
+  "variant"
 )
 
 # Valid values to use for taxonomicRank
@@ -42,6 +43,7 @@ valid_tax_rank <- c(
 
 dwctaxon::dct_options(
   check_sci_name = FALSE,
+  check_mapping_accepted_status = TRUE,
   valid_tax_status = paste(valid_tax_status, collapse = ", ")
 )
 
