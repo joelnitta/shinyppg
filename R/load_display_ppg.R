@@ -47,9 +47,8 @@ display_ppg_server <- function(id, ppg) {
   column_visibility <- reactiveVal(FALSE)
 
   moduleServer(id, function(input, output, session) {
-
     # Set up PPG table
-    render_table <- function () {
+    render_table <- function() {
       DT::renderDataTable(
         DT::datatable(
           data = ppg(),
