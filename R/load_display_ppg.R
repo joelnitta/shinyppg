@@ -9,6 +9,7 @@
 display_ppg_ui <- function(id) {
   tagList(
     DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
+    checkboxInput(NS(id, "dt_sel"), "Select/Deselect All"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -42,15 +43,6 @@ display_ppg_server <- function(id, ppg) {
 
   moduleServer(id, function(input, output, session) {
 
-    # Define default settings for column sorting
-    default_columns <- list(
-      modified = reactable::colDef(defaultSortOrder = "desc")
-    )
-    default_sorted <- c("modified", "scientificName")
-    # Make reactive
-    columns_state <- reactiveVal(default_columns)
-    sorted_state <- reactiveVal(default_sorted)
-
     output$ppg_table <- DT::renderDataTable({
       DT::datatable(
         data = ppg(),
@@ -60,6 +52,15 @@ display_ppg_server <- function(id, ppg) {
       )
     },
     server = TRUE)
+
+    dt_proxy <- DT::dataTableProxy("ppg_table")
+    observeEvent(input$dt_sel, {
+      if (isTRUE(input$dt_sel)) {
+        DT::selectRows(dt_proxy, input$ppg_table_rows_all)
+      } else {
+        DT::selectRows(dt_proxy, NULL)
+      }
+    })
 
     selected_rows <- reactive(
       input$ppg_table_rows_selected
