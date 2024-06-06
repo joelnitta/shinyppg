@@ -8,7 +8,7 @@
 #' @noRd
 display_ppg_ui <- function(id) {
   tagList(
-    reactable::reactableOutput(NS(id, "ppg_table"), width = "100%"),
+    DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -51,34 +51,18 @@ display_ppg_server <- function(id, ppg) {
     columns_state <- reactiveVal(default_columns)
     sorted_state <- reactiveVal(default_sorted)
 
-    output$ppg_table <- reactable::renderReactable({
-      reactable::reactable(
-        ppg(),
-        filterable = TRUE,
-        searchable = TRUE,
-        selection = "multiple",
-        resizable = TRUE,
-        fullWidth = TRUE,
-        columns = columns_state(),
-        defaultSorted = sorted_state()
+    output$ppg_table <- DT::renderDataTable({
+      DT::datatable(
+        data = ppg(),
+        rownames = FALSE,
+        filter = "top",
+        selection = "multiple"
       )
-    })
-
-    # Update column sorting so we don't lose it when the table gets re-created
-    current_sorted <- reactive(
-      reactable::getReactableState("ppg_table", "sorted")
-    )
-    observe({
-      current_sorted_names <- names(current_sorted())
-      current_sorted_asc_desc <- set_asc_desc(current_sorted())
-      if (!is.null(current_sorted_names)) {
-        sorted_state(current_sorted_names)
-        columns_state(current_sorted_asc_desc)
-      }
-    })
+    },
+    server = TRUE)
 
     selected_rows <- reactive(
-      reactable::getReactableState("ppg_table", "selected")
+      input$ppg_table_rows_selected
     )
     output$selected_rows_message <- renderText({
       num_selected <- length(selected_rows())
@@ -86,4 +70,17 @@ display_ppg_server <- function(id, ppg) {
     })
     return(selected_rows)
   })
+}
+
+# test app
+display_ppg_app <- function() {
+  ui <- fluidPage(
+    display_ppg_ui("ppg_table")
+  )
+  server <- function(input, output, session) {
+    # Load data
+    ppg <- load_data_server("ppg")
+    display_ppg_server("ppg_table", ppg)
+  }
+  shinyApp(ui, server)
 }
