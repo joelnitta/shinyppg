@@ -9,7 +9,8 @@
 display_ppg_ui <- function(id) {
   tagList(
     DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
-    checkboxInput(NS(id, "dt_sel"), "Select/Deselect All"),
+    actionButton(NS(id, "select_all"), "Select All"),
+    actionButton(NS(id, "select_none"), "Select None"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -42,25 +43,31 @@ display_ppg_server <- function(id, ppg) {
   stopifnot(is.reactive(ppg))
 
   moduleServer(id, function(input, output, session) {
-
-    output$ppg_table <- DT::renderDataTable({
-      DT::datatable(
-        data = ppg(),
-        rownames = FALSE,
-        filter = "top",
-        selection = "multiple"
-      )
-    },
-    server = TRUE)
+    output$ppg_table <- DT::renderDataTable(
+      {
+        DT::datatable(
+          data = ppg(),
+          rownames = FALSE,
+          filter = "top",
+          selection = "multiple"
+        )
+      },
+      server = TRUE
+    )
 
     dt_proxy <- DT::dataTableProxy("ppg_table")
-    observeEvent(input$dt_sel, {
-      if (isTRUE(input$dt_sel)) {
-        DT::selectRows(dt_proxy, input$ppg_table_rows_all)
-      } else {
-        DT::selectRows(dt_proxy, NULL)
-      }
-    })
+
+    observeEvent(
+      input$select_all,
+      DT::selectRows(
+        dt_proxy,
+        unique(c(input$ppg_table_rows_all, input$ppg_table_rows_selected))
+      )
+    )
+    observeEvent(
+      input$select_none,
+      DT::selectRows(dt_proxy, NULL)
+    )
 
     selected_rows <- reactive(
       input$ppg_table_rows_selected
