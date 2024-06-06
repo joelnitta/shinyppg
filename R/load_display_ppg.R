@@ -11,6 +11,7 @@ display_ppg_ui <- function(id) {
     DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
     actionButton(NS(id, "select_all"), "Select All"),
     actionButton(NS(id, "select_none"), "Select None"),
+    actionButton(NS(id, "toggle_columns"), "Show/Hide ID Columns"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -42,25 +43,47 @@ display_ppg_server <- function(id, ppg) {
   # Check args
   stopifnot(is.reactive(ppg))
 
-  moduleServer(id, function(input, output, session) {
-    output$ppg_table <- DT::renderDataTable(
-      DT::datatable(
-        data = ppg(),
-        rownames = FALSE,
-        filter = "top",
-        selection = "multiple",
-        options = list(
-          order = list(
-            list(select_sort_col(ppg(), "modified"), "desc"),
-            list(select_sort_col(ppg(), "scientificName"), "asc")
-          )
-        )
-      ),
-      server = TRUE
-    )
+  # Reactive value to store column visibility state
+  column_visibility <- reactiveVal(FALSE)
 
+  moduleServer(id, function(input, output, session) {
+
+    # Set up PPG table
+    render_table <- function () {
+      DT::renderDataTable(
+        DT::datatable(
+          data = ppg(),
+          rownames = FALSE,
+          filter = "top",
+          selection = "multiple",
+          options = list(
+            order = list(
+              list(select_sort_col(ppg(), "modified"), "desc"),
+              list(select_sort_col(ppg(), "scientificName"), "asc")
+            ),
+            columnDefs = list(
+              list(
+                targets = c(
+                  select_sort_col(ppg(), "taxonID"),
+                  select_sort_col(ppg(), "acceptedNameUsageID"),
+                  select_sort_col(ppg(), "parentNameUsageID")
+                ),
+                visible = column_visibility()
+              )
+            )
+          )
+        ),
+        server = TRUE
+      )
+    }
+
+    # Initial render
+    output$ppg_table <- render_table()
+
+    # Set up proxy for handling row selection
     dt_proxy <- DT::dataTableProxy("ppg_table")
 
+    # Select / deselect rows
     observeEvent(
       input$select_all,
       DT::selectRows(
@@ -73,6 +96,17 @@ display_ppg_server <- function(id, ppg) {
       DT::selectRows(dt_proxy, NULL)
     )
 
+    # Show / hide ID coluns
+    observeEvent(input$toggle_columns, {
+      current_visibility <- column_visibility()
+      column_visibility(!current_visibility)
+
+      # Redraw the datatable with updated visibility
+      output$ppg_table <- render_table()
+      DT::replaceData(dt_proxy, ppg(), resetPaging = FALSE, rownames = FALSE)
+    })
+
+    # Display number of selected rows
     selected_rows <- reactive(
       input$ppg_table_rows_selected
     )
