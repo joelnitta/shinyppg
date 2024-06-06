@@ -44,14 +44,18 @@ display_ppg_server <- function(id, ppg) {
 
   moduleServer(id, function(input, output, session) {
     output$ppg_table <- DT::renderDataTable(
-      {
-        DT::datatable(
-          data = ppg(),
-          rownames = FALSE,
-          filter = "top",
-          selection = "multiple"
+      DT::datatable(
+        data = ppg(),
+        rownames = FALSE,
+        filter = "top",
+        selection = "multiple",
+        options = list(
+          order = list(
+            list(select_sort_col(ppg(), "modified"), "desc"),
+            list(select_sort_col(ppg(), "scientificName"), "asc")
+          )
         )
-      },
+      ),
       server = TRUE
     )
 
