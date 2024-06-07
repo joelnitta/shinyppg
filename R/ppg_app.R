@@ -56,6 +56,7 @@ ppg_app <- function() {
     # Set initial values
     composed_name_add <- reactiveVal("")
     composed_name_modify <- reactiveVal("")
+    show_advanced <- reactiveVal(FALSE)
 
     # Other server logic
     rows_selected <- display_ppg_server("display_ppg", ppg)
@@ -68,13 +69,20 @@ ppg_app <- function() {
       composed_name_modify, ppg, rows_selected,
       fill_sci_name = TRUE
     )
-    add_row_server(
+    show_advanced <- add_row_server(
       "add_row",
       ppg,
       composed_name_add,
-      rows_selected
+      rows_selected,
+      show_advanced
     )
-    modify_row_server("modify_row", ppg, rows_selected, composed_name_modify)
+    show_advanced <- modify_row_server(
+      "modify_row",
+      ppg,
+      rows_selected,
+      composed_name_modify,
+      show_advanced
+    )
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
   }

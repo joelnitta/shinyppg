@@ -8,15 +8,15 @@
 #' @returns Server logic
 #' @autoglobal
 #' @noRd
-modify_row_server <- function(id, ppg, rows_selected, composed_name) {
-
+modify_row_server <- function(id, ppg, rows_selected, composed_name, show_advanced) {
   # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
+  stopifnot(is.reactive(show_advanced))
+
 
   moduleServer(id, function(input, output, session) {
-
     # initiate error message
     error_msg <- reactiveVal("")
 
@@ -45,24 +45,27 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
       # Reset error message each time apply is clicked
       error_msg("")
       # Catch errors when modifying
-      tryCatch({
-        updated_data <- dwctaxon::dct_modify_row(
-          ppg(),
-          taxonID = null_if_blank(input$taxonID),
-          scientificName = null_if_blank(composed_name()),
-          namePublishedIn = null_if_blank(input$namePublishedIn),
-          taxonRank = null_if_blank(input$taxonRank),
-          taxonomicStatus = null_if_blank(input$taxonomicStatus),
-          taxonRemarks = null_if_blank(input$taxonRemarks),
-          acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
-          acceptedNameUsage = null_if_blank(acceptedNameUsage()),
-          parentNameUsageID = null_if_blank(input$parentNameUsageID),
-          parentNameUsage = null_if_blank(parentNameUsage())
-        )
-        ppg(updated_data)
-      }, error = function(e) {
-        error_msg(paste("Error:", e$message))
-      })
+      tryCatch(
+        {
+          updated_data <- dwctaxon::dct_modify_row(
+            ppg(),
+            taxonID = null_if_blank(input$taxonID),
+            scientificName = null_if_blank(composed_name()),
+            namePublishedIn = null_if_blank(input$namePublishedIn),
+            taxonRank = null_if_blank(input$taxonRank),
+            taxonomicStatus = null_if_blank(input$taxonomicStatus),
+            taxonRemarks = null_if_blank(input$taxonRemarks),
+            acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
+            acceptedNameUsage = null_if_blank(acceptedNameUsage()),
+            parentNameUsageID = null_if_blank(input$parentNameUsageID),
+            parentNameUsage = null_if_blank(parentNameUsage())
+          )
+          ppg(updated_data)
+        },
+        error = function(e) {
+          error_msg(paste("Error:", e$message))
+        }
+      )
       output$error_msg <- renderText(error_msg())
     })
 
@@ -72,7 +75,7 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
         selected_row <- ppg()[rows_selected(), ]
         purrr::walk(
           cols_select,
-          ~fill_data_entry_from_row(
+          ~ fill_data_entry_from_row(
             session = session,
             item = .x,
             selected_row = selected_row
@@ -87,9 +90,26 @@ modify_row_server <- function(id, ppg, rows_selected, composed_name) {
       if (mult_or_no_rows_selected()) {
         purrr::walk(
           cols_select,
-          ~reset_data_entry(session = session, item = .x)
+          ~ reset_data_entry(session = session, item = .x)
         )
       }
     })
+
+    # Toggle advanced options
+    observeEvent(input$advanced_options, {
+      show_advanced(!show_advanced())
+    })
+    observe({
+      shinyjs::toggle("taxonID", condition = show_advanced())
+      shinyjs::toggle("acceptedNameUsageID", condition = show_advanced())
+      shinyjs::toggle("parentNameUsageID", condition = show_advanced())
+      if (show_advanced()) {
+        shinyjs::html("advanced_options", "Hide advanced options")
+      } else {
+        shinyjs::html("advanced_options", "Show advanced options")
+      }
+    })
+    return(show_advanced)
+
   })
 }

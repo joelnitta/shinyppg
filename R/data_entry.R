@@ -8,6 +8,7 @@
 #' @noRd
 data_entry_ui <- function(id) {
   tagList(
+    shinyjs::useShinyjs(),
     selectInput(
       NS(id, "taxonRank"),
       label = "taxonRank",
@@ -40,21 +41,20 @@ data_entry_ui <- function(id) {
       col_select = "parentNameUsage",
       help_text = "Scientific name of parent taxon"
     ),
-    textInput(
+    actionButton(NS(id, "advanced_options"), "Show advanced options"),
+    shinyjs::hidden(textInput(
       NS(id, "taxonID"),
       label = "taxonID"
-    ),
-    helpText("Taxon ID (advanced)"),
-    textInput(
+    )),
+    shinyjs::hidden(textInput(
       NS(id, "acceptedNameUsageID"),
       label = "acceptedNameUsageID"
-    ),
-    helpText("Taxon ID of accepted name (advanced)"),
-    textInput(
+    )),
+    shinyjs::hidden(textInput(
       NS(id, "parentNameUsageID"),
       label = "parentNameUsageID"
-    ),
-    helpText("Taxon ID of parent name (advanced)"),
+    )),
+    hr(),
     actionButton(NS(id, "apply"), "Apply"),
     textOutput(NS(id, "error_msg"))
   )

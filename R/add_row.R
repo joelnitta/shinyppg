@@ -10,10 +10,12 @@
 #' @returns Server logic
 #' @autoglobal
 #' @noRd
-add_row_server <- function(id, ppg, composed_name, rows_selected) {
+add_row_server <- function(id, ppg, composed_name, rows_selected,
+  show_advanced) {
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
+  stopifnot(is.reactive(show_advanced))
 
   moduleServer(id, function(input, output, session) {
 
@@ -67,5 +69,22 @@ add_row_server <- function(id, ppg, composed_name, rows_selected) {
 
       output$error_msg <- renderText(error_msg())
     })
+
+    # Toggle advanced options
+    observeEvent(input$advanced_options, {
+      show_advanced(!show_advanced())
+    })
+    observe({
+      shinyjs::toggle("taxonID", condition = show_advanced())
+      shinyjs::toggle("acceptedNameUsageID", condition = show_advanced())
+      shinyjs::toggle("parentNameUsageID", condition = show_advanced())
+      if (show_advanced()) {
+        shinyjs::html("advanced_options", "Hide advanced options")
+      } else {
+        shinyjs::html("advanced_options", "Show advanced options")
+      }
+    })
+    return(show_advanced)
+
   })
 }
