@@ -258,3 +258,16 @@ initial_validate <- function(ppg) {
     }
   )
 }
+
+#' Select a column of the PPG dataframe for sorting with DT::datatable()
+#'
+#' Note that sorting uses zero-based counting
+#'
+#' @param ppg PPG dataframe
+#' @param col_name Name of column to sort by
+#'
+#' @noRd
+select_sort_col <- function(ppg, col_name) {
+  stopifnot(col_name %in% colnames(ppg))
+  which(colnames(ppg) == col_name) - 1
+}

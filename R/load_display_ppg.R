@@ -8,7 +8,10 @@
 #' @noRd
 display_ppg_ui <- function(id) {
   tagList(
-    reactable::reactableOutput(NS(id, "ppg_table"), width = "100%"),
+    DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
+    actionButton(NS(id, "select_all"), "Select All"),
+    actionButton(NS(id, "select_none"), "Select None"),
+    actionButton(NS(id, "toggle_columns"), "Show/Hide ID Columns"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -40,45 +43,71 @@ display_ppg_server <- function(id, ppg) {
   # Check args
   stopifnot(is.reactive(ppg))
 
+  # Reactive value to store column visibility state
+  column_visibility <- reactiveVal(FALSE)
+
   moduleServer(id, function(input, output, session) {
-
-    # Define default settings for column sorting
-    default_columns <- list(
-      modified = reactable::colDef(defaultSortOrder = "desc")
-    )
-    default_sorted <- c("modified", "scientificName")
-    # Make reactive
-    columns_state <- reactiveVal(default_columns)
-    sorted_state <- reactiveVal(default_sorted)
-
-    output$ppg_table <- reactable::renderReactable({
-      reactable::reactable(
-        ppg(),
-        filterable = TRUE,
-        searchable = TRUE,
-        selection = "multiple",
-        resizable = TRUE,
-        fullWidth = TRUE,
-        columns = columns_state(),
-        defaultSorted = sorted_state()
+    # Set up PPG table
+    render_table <- function() {
+      DT::renderDataTable(
+        DT::datatable(
+          data = ppg(),
+          rownames = FALSE,
+          filter = "top",
+          selection = "multiple",
+          options = list(
+            order = list(
+              list(select_sort_col(ppg(), "modified"), "desc"),
+              list(select_sort_col(ppg(), "scientificName"), "asc")
+            ),
+            columnDefs = list(
+              list(
+                targets = c(
+                  select_sort_col(ppg(), "taxonID"),
+                  select_sort_col(ppg(), "acceptedNameUsageID"),
+                  select_sort_col(ppg(), "parentNameUsageID")
+                ),
+                visible = column_visibility()
+              )
+            )
+          )
+        ),
+        server = TRUE
       )
-    })
+    }
 
-    # Update column sorting so we don't lose it when the table gets re-created
-    current_sorted <- reactive(
-      reactable::getReactableState("ppg_table", "sorted")
+    # Initial render
+    output$ppg_table <- render_table()
+
+    # Set up proxy for handling row selection
+    dt_proxy <- DT::dataTableProxy("ppg_table")
+
+    # Select / deselect rows
+    observeEvent(
+      input$select_all,
+      DT::selectRows(
+        dt_proxy,
+        unique(c(input$ppg_table_rows_all, input$ppg_table_rows_selected))
+      )
     )
-    observe({
-      current_sorted_names <- names(current_sorted())
-      current_sorted_asc_desc <- set_asc_desc(current_sorted())
-      if (!is.null(current_sorted_names)) {
-        sorted_state(current_sorted_names)
-        columns_state(current_sorted_asc_desc)
-      }
+    observeEvent(
+      input$select_none,
+      DT::selectRows(dt_proxy, NULL)
+    )
+
+    # Show / hide ID coluns
+    observeEvent(input$toggle_columns, {
+      current_visibility <- column_visibility()
+      column_visibility(!current_visibility)
+
+      # Redraw the datatable with updated visibility
+      output$ppg_table <- render_table()
+      DT::replaceData(dt_proxy, ppg(), resetPaging = FALSE, rownames = FALSE)
     })
 
+    # Display number of selected rows
     selected_rows <- reactive(
-      reactable::getReactableState("ppg_table", "selected")
+      input$ppg_table_rows_selected
     )
     output$selected_rows_message <- renderText({
       num_selected <- length(selected_rows())
@@ -86,4 +115,17 @@ display_ppg_server <- function(id, ppg) {
     })
     return(selected_rows)
   })
+}
+
+# test app
+display_ppg_app <- function() {
+  ui <- fluidPage(
+    display_ppg_ui("ppg_table")
+  )
+  server <- function(input, output, session) {
+    # Load data
+    ppg <- load_data_server("ppg")
+    display_ppg_server("ppg_table", ppg)
+  }
+  shinyApp(ui, server)
 }
