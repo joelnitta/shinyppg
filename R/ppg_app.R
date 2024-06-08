@@ -70,18 +70,18 @@ ppg_app <- function() {
       fill_sci_name = TRUE
     )
     show_advanced <- add_row_server(
-      "add_row",
-      ppg,
-      composed_name_add,
-      rows_selected,
-      show_advanced
+      id = "add_row",
+      ppg = ppg,
+      composed_name = composed_name_add,
+      rows_selected = rows_selected,
+      show_advanced = show_advanced
     )
     show_advanced <- modify_row_server(
-      "modify_row",
-      ppg,
-      rows_selected,
-      composed_name_modify,
-      show_advanced
+      id = "modify_row",
+      ppg = ppg,
+      rows_selected = rows_selected,
+      composed_name = composed_name_modify,
+      show_advanced = show_advanced
     )
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
