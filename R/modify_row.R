@@ -30,7 +30,7 @@ modify_row_server <- function(
       id = "acceptedNameUsage",
       ppg = ppg,
       rows_selected = rows_selected,
-      placeholder = "Select parent name",
+      placeholder = "Select accepted name",
       col_select = "acceptedNameUsage",
       fill_name = TRUE,
       TRUE
