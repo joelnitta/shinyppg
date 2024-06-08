@@ -11,7 +11,7 @@ display_ppg_ui <- function(id) {
     DT::dataTableOutput(NS(id, "ppg_table"), width = "100%"),
     actionButton(NS(id, "select_all"), "Select All"),
     actionButton(NS(id, "select_none"), "Select None"),
-    actionButton(NS(id, "toggle_columns"), "Show/Hide ID Columns"),
+    actionButton(NS(id, "toggle_columns"), "Show advanced columns"),
     textOutput(NS(id, "selected_rows_message"))
   )
 }
@@ -103,6 +103,13 @@ display_ppg_server <- function(id, ppg) {
       # Redraw the datatable with updated visibility
       output$ppg_table <- render_table()
       DT::replaceData(dt_proxy, ppg(), resetPaging = FALSE, rownames = FALSE)
+
+      # Toggle appearance of button
+      if (isTRUE(input$toggle_columns %% 2 == 1)) {
+        shinyjs::html("toggle_columns", "Hide advanced columns")
+      } else {
+        shinyjs::html("toggle_columns", "Show advanced columns")
+      }
     })
 
     # Display number of selected rows
