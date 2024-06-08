@@ -3,18 +3,24 @@
 #' Internal function
 #'
 #' @import shiny
-#' @param id Character vector of length 1; the ID for this module.
+#' @param id Character vector of length 1; the ID for
+#' this module.
 #' @param ppg Reactive dataframe (tibble) of PPG data
-#' @returns Server logic
+#' @param rows_selected A reactive value: currently selected rows
+#' @param composed_name String; scientific name, that may be composed
+#' from auto-completed fields
+#' @param rows_selected Numeric vector; index of selected rows
+#' @param show_advanced Logical; should advanced input fields be displayed?
+#' @returns Value of `show_advanced` so this can be shared across modules
 #' @autoglobal
 #' @noRd
-modify_row_server <- function(id, ppg, rows_selected, composed_name, show_advanced) {
+modify_row_server <- function(
+    id, ppg, rows_selected, composed_name, show_advanced) {
   # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
   stopifnot(is.reactive(show_advanced))
-
 
   moduleServer(id, function(input, output, session) {
     # initiate error message

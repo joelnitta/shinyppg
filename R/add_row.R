@@ -7,18 +7,22 @@
 #' this module.
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @param rows_selected A reactive value: currently selected rows
-#' @returns Server logic
+#' @param composed_name String; scientific name, that may be composed
+#' from auto-completed fields
+#' @param rows_selected Numeric vector; index of selected rows
+#' @param show_advanced Logical; should advanced input fields be displayed?
+#' @returns Value of `show_advanced` so this can be shared across modules
 #' @autoglobal
 #' @noRd
-add_row_server <- function(id, ppg, composed_name, rows_selected,
-  show_advanced) {
+add_row_server <- function(
+    id, ppg, composed_name, rows_selected, show_advanced) {
+  # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
   stopifnot(is.reactive(show_advanced))
 
   moduleServer(id, function(input, output, session) {
-
     # initiate error message
     error_msg <- reactiveVal("")
 
@@ -43,29 +47,31 @@ add_row_server <- function(id, ppg, composed_name, rows_selected,
     )
 
     observeEvent(input$apply, {
-
       # Reset error message each time apply is clicked
       error_msg("")
 
       # Add one row, catching any errors in error_msg
-      tryCatch({
-        updated_data <- dwctaxon::dct_add_row(
-          ppg(),
-          taxonID = null_if_blank(input$taxonID),
-          scientificName = null_if_blank(composed_name()),
-          namePublishedIn = null_if_blank(input$namePublishedIn),
-          taxonRank = null_if_blank(input$taxonRank),
-          taxonomicStatus = null_if_blank(input$taxonomicStatus),
-          taxonRemarks = null_if_blank(input$taxonRemarks),
-          acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
-          acceptedNameUsage = null_if_blank(acceptedNameUsage()),
-          parentNameUsageID = null_if_blank(input$parentNameUsageID),
-          parentNameUsage = null_if_blank(parentNameUsage())
-        )
-        ppg(updated_data)
-      }, error = function(e) {
-        error_msg(paste("Error:", e$message))
-      })
+      tryCatch(
+        {
+          updated_data <- dwctaxon::dct_add_row(
+            ppg(),
+            taxonID = null_if_blank(input$taxonID),
+            scientificName = null_if_blank(composed_name()),
+            namePublishedIn = null_if_blank(input$namePublishedIn),
+            taxonRank = null_if_blank(input$taxonRank),
+            taxonomicStatus = null_if_blank(input$taxonomicStatus),
+            taxonRemarks = null_if_blank(input$taxonRemarks),
+            acceptedNameUsageID = null_if_blank(input$acceptedNameUsageID),
+            acceptedNameUsage = null_if_blank(acceptedNameUsage()),
+            parentNameUsageID = null_if_blank(input$parentNameUsageID),
+            parentNameUsage = null_if_blank(parentNameUsage())
+          )
+          ppg(updated_data)
+        },
+        error = function(e) {
+          error_msg(paste("Error:", e$message))
+        }
+      )
 
       output$error_msg <- renderText(error_msg())
     })
