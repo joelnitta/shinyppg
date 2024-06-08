@@ -39,9 +39,11 @@ load_data_server <- function(id) {
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns List of metadata about current table
 #' @noRd
-display_ppg_server <- function(id, ppg) {
+display_ppg_server <- function(id, ppg, credentials) {
   # Check args
   stopifnot(is.reactive(ppg))
+  stopifnot(is.reactive(credentials))
+
 
   # Reactive value to store column visibility state
   column_visibility <- reactiveVal(FALSE)
@@ -50,28 +52,30 @@ display_ppg_server <- function(id, ppg) {
     # Set up PPG table
     render_table <- function() {
       DT::renderDataTable(
-        DT::datatable(
-          data = ppg(),
-          rownames = FALSE,
-          filter = "top",
-          selection = "multiple",
-          options = list(
-            order = list(
-              list(select_sort_col(ppg(), "modified"), "desc"),
-              list(select_sort_col(ppg(), "scientificName"), "asc")
-            ),
-            columnDefs = list(
-              list(
-                targets = c(
-                  select_sort_col(ppg(), "taxonID"),
-                  select_sort_col(ppg(), "acceptedNameUsageID"),
-                  select_sort_col(ppg(), "parentNameUsageID")
-                ),
-                visible = column_visibility()
+        {
+          DT::datatable(
+            data = ppg(),
+            rownames = FALSE,
+            filter = "top",
+            selection = "multiple",
+            options = list(
+              order = list(
+                list(select_sort_col(ppg(), "modified"), "desc"),
+                list(select_sort_col(ppg(), "scientificName"), "asc")
+              ),
+              columnDefs = list(
+                list(
+                  targets = c(
+                    select_sort_col(ppg(), "taxonID"),
+                    select_sort_col(ppg(), "acceptedNameUsageID"),
+                    select_sort_col(ppg(), "parentNameUsageID")
+                  ),
+                  visible = column_visibility()
+                )
               )
             )
           )
-        ),
+        },
         server = TRUE
       )
     }
