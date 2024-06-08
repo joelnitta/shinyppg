@@ -15,10 +15,47 @@
 ppg_app <- function() {
   ui <- fluidPage(
     titlePanel("PPG Editor"),
-    tabsetPanel(
-      tabPanel(
-        "Data Entry",
-        {
+    shiny::div(
+      class = "pull-right",
+      shinyauthr::logoutUI(id = shiny::NS("logout_module", "logout"))
+    ),
+    shinyauthr::loginUI(id = shiny::NS("login_module", "login")),
+    shiny::uiOutput("main_content")
+  )
+
+  server <- function(input, output, session) {
+    # Load data
+    ppg <- load_data_server("ppg")
+    higher_names <- load_pterido_higher_names()
+    epithets <- load_pterido_sp_epithets()
+    ipni_authors <- load_authors()
+
+    # Set initial values
+    composed_name_add <- reactiveVal("")
+    composed_name_modify <- reactiveVal("")
+    show_advanced <- reactiveVal(FALSE)
+
+    # Call login module
+    credentials <- login_server(
+      id = "login_module",
+      data = user_base,
+      user_col = "user",
+      pwd_col = "password",
+      sodium_hashed = TRUE,
+      log_out = shiny::reactive(logout_init())
+    )
+
+    # Call logout module
+    logout_init <- logout_server(
+      id = "logout_module",
+      active = shiny::reactive(credentials()$user_auth)
+    )
+
+    output$main_content <- shiny::renderUI({
+      shiny::req(credentials()$user_auth)
+      tabsetPanel(
+        tabPanel(
+          "Data Entry",
           sidebarLayout(
             sidebarPanel(
               tabsetPanel(
@@ -40,26 +77,14 @@ ppg_app <- function() {
               display_ppg_ui("display_ppg")
             )
           )
-        }
-      ),
-      tabPanel("Data Validation", validate_ui("validate")),
-      tabPanel("Settings")
-    ),
-  )
-  server <- function(input, output, session) {
-    # Load data
-    ppg <- load_data_server("ppg")
-    higher_names <- load_pterido_higher_names()
-    epithets <- load_pterido_sp_epithets()
-    ipni_authors <- load_authors()
-
-    # Set initial values
-    composed_name_add <- reactiveVal("")
-    composed_name_modify <- reactiveVal("")
-    show_advanced <- reactiveVal(FALSE)
+        ),
+        tabPanel("Data Validation", validate_ui("validate")),
+        tabPanel("Settings")
+      )
+    })
 
     # Other server logic
-    rows_selected <- display_ppg_server("display_ppg", ppg)
+    rows_selected <- display_ppg_server("display_ppg", ppg, credentials)
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,
       composed_name_add, ppg, rows_selected
@@ -86,5 +111,6 @@ ppg_app <- function() {
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
   }
-  shinyApp(ui, server)
+
+  shiny::shinyApp(ui, server)
 }
