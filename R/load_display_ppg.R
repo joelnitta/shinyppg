@@ -68,7 +68,8 @@ display_ppg_server <- function(id, ppg, credentials) {
                   targets = c(
                     select_sort_col(ppg(), "taxonID"),
                     select_sort_col(ppg(), "acceptedNameUsageID"),
-                    select_sort_col(ppg(), "parentNameUsageID")
+                    select_sort_col(ppg(), "parentNameUsageID"),
+                    select_sort_col(ppg(), "modifiedByID")
                   ),
                   visible = column_visibility()
                 )
