@@ -89,8 +89,8 @@ ppg_app <- function() {
     # Set user name and ID metadata from login info
     observe({
       shiny::req(credentials()$user_auth)
-      dct_options(user_name = credentials()$info$name)
-      dct_options(user_id = credentials()$info$user)
+      dwctaxon::dct_options(user_name = credentials()$info$name)
+      dwctaxon::dct_options(user_id = credentials()$info$user)
     })
 
     rows_selected <- display_ppg_server("display_ppg", ppg, credentials)

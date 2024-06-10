@@ -53,7 +53,7 @@ auth_app <- function() {
   # Main Server
   server <- function(input, output, session) {
     # Define a database with some user names and passwords
-    user_base <- tibble::tibble(
+    user_base <- data.frame(
       user = c("user1", "user2"),
       password = c("pass1", "pass2"),
       permissions = c("admin", "standard"),

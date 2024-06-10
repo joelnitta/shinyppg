@@ -6,3 +6,4 @@
 ^shiny-run\.R$
 ^data-raw$
 ^\.rscignore$
+^secrets\.csv$
