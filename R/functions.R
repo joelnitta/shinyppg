@@ -15,7 +15,9 @@ cols_select <- c(
   "taxonID",
   "acceptedNameUsageID",
   "parentNameUsageID",
-  "modified"
+  "modified",
+  "modifiedBy",
+  "modifiedByID"
 )
 
 # Valid values to use for taxonomicStatus
@@ -44,7 +46,10 @@ valid_tax_rank <- c(
 dwctaxon::dct_options(
   check_sci_name = FALSE,
   check_mapping_accepted_status = TRUE,
-  valid_tax_status = paste(valid_tax_status, collapse = ", ")
+  valid_tax_status = paste(valid_tax_status, collapse = ", "),
+  stamp_modified_by = TRUE,
+  stamp_modified_by_id = TRUE,
+  extra_cols = c("modifiedBy", "modifiedByID")
 )
 
 #' Convert output of reactable::getReactableState() for column sorting to
@@ -268,6 +273,6 @@ initial_validate <- function(ppg) {
 #'
 #' @noRd
 select_sort_col <- function(ppg, col_name) {
-  stopifnot(col_name %in% colnames(ppg))
+  if (!col_name %in% colnames(ppg)) return(NULL)
   which(colnames(ppg) == col_name) - 1
 }

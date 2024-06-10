@@ -51,6 +51,7 @@ ppg_app <- function() {
       active = shiny::reactive(credentials()$user_auth)
     )
 
+    # Specify UI
     output$main_content <- shiny::renderUI({
       shiny::req(credentials()$user_auth)
       tabsetPanel(
@@ -84,6 +85,14 @@ ppg_app <- function() {
     })
 
     # Other server logic
+
+    # Set user name and ID metadata from login info
+    observe({
+      shiny::req(credentials()$user_auth)
+      dct_options(user_name = credentials()$info$name)
+      dct_options(user_id = credentials()$info$user)
+    })
+
     rows_selected <- display_ppg_server("display_ppg", ppg, credentials)
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,

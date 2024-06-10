@@ -17,7 +17,7 @@ RoxygenNote: 7.3.1
 Imports: 
     dplyr,
     DT,
-    dwctaxon,
+    dwctaxon (>= 2.0.3.9000),
     pkgload,
     purrr,
     reactable,
@@ -36,3 +36,5 @@ Suggests:
 Config/testthat/edition: 3
 Config/roxyglobals/filename: globals.R
 Config/roxyglobals/unique: FALSE
+Remotes:  
+    ropensci/dwctaxon
