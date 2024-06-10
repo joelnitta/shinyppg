@@ -39,11 +39,9 @@ load_data_server <- function(id) {
 #' @param ppg Reactive dataframe (tibble) of PPG data
 #' @returns List of metadata about current table
 #' @noRd
-display_ppg_server <- function(id, ppg, credentials) {
+display_ppg_server <- function(id, ppg) {
   # Check args
   stopifnot(is.reactive(ppg))
-  stopifnot(is.reactive(credentials))
-
 
   # Reactive value to store column visibility state
   column_visibility <- reactiveVal(FALSE)

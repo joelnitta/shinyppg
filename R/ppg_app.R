@@ -54,6 +54,8 @@ ppg_app <- function() {
     # Specify UI
     output$main_content <- shiny::renderUI({
       shiny::req(credentials()$user_auth)
+      dwctaxon::dct_options(user_name = credentials()$info$name)
+      dwctaxon::dct_options(user_id = credentials()$info$user)
       tabsetPanel(
         tabPanel(
           "Data Entry",
@@ -86,14 +88,7 @@ ppg_app <- function() {
 
     # Other server logic
 
-    # Set user name and ID metadata from login info
-    observe({
-      shiny::req(credentials()$user_auth)
-      dwctaxon::dct_options(user_name = credentials()$info$name)
-      dwctaxon::dct_options(user_id = credentials()$info$user)
-    })
-
-    rows_selected <- display_ppg_server("display_ppg", ppg, credentials)
+    rows_selected <- display_ppg_server("display_ppg", ppg)
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,
       composed_name_add, ppg, rows_selected
