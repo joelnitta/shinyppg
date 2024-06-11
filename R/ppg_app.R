@@ -91,12 +91,15 @@ ppg_app <- function() {
     rows_selected <- display_ppg_server("display_ppg", ppg)
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,
-      composed_name_add, ppg, rows_selected
+      composed_name_add, ppg, rows_selected,
+      fill_sci_name = FALSE,
+      credentials
     )
     compose_name_server(
       "sci_name_modify", higher_names, epithets, ipni_authors,
       composed_name_modify, ppg, rows_selected,
-      fill_sci_name = TRUE
+      fill_sci_name = TRUE,
+      credentials
     )
     show_advanced <- add_row_server(
       id = "add_row",

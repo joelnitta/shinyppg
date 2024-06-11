@@ -50,12 +50,13 @@ compose_name_ui <- function(id) {
 #' @noRd
 compose_name_server <- function(
   id, higher_names, epithets, authors, composed_name, ppg, rows_selected,
-  fill_sci_name = FALSE) {
+  fill_sci_name = FALSE, credentials) {
 
   # Check args
   stopifnot(is.reactive(composed_name))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(ppg))
+  stopifnot(is.reactive(credentials))
   stopifnot(!is.reactive(higher_names))
   stopifnot(!is.reactive(epithets))
   stopifnot(!is.reactive(authors))
@@ -72,19 +73,22 @@ compose_name_server <- function(
     update_selectize_compose_name(
       session, "higher_name",
       choices = higher_names,
-      placeholder = "Select higher name"
+      placeholder = "Select higher name",
+      credentials = credentials
     )
 
     update_selectize_compose_name(
       session, "epithet",
       choices = epithets,
-      placeholder = "Select specific epithet"
+      placeholder = "Select specific epithet",
+      credentials = credentials
     )
 
     update_selectize_compose_name(
       session, "author",
       choices = authors,
-      placeholder = "Select author"
+      placeholder = "Select author",
+      credentials = credentials
     )
 
     observeEvent(input$higher_name, {

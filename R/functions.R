@@ -131,21 +131,25 @@ load_pterido_sp_epithets <- function() {
 #' @param inputId The id of the input object.
 #' @param choices Selection choices to include in the selectize input
 #' @param placeholder Text to display before selection is made.
+#' @param credentials List; credentials passed from login
 #' @return Output of updateSelectizeInput()
 #' @noRd
 update_selectize_compose_name <- function(
-    session, inputId, choices, placeholder) {
-  updateSelectizeInput(
-    session = session,
-    inputId = inputId,
-    choices = choices,
-    selected = "",
-    server = TRUE,
-    options = list(
-      placeholder = placeholder,
-      onInitialize = I('function() { this.setValue(""); }')
+    session, inputId, choices, placeholder, credentials) {
+  shiny::observe({
+    shiny::req(credentials()$user_auth)
+      updateSelectizeInput(
+      session = session,
+      inputId = inputId,
+      choices = choices,
+      selected = "",
+      server = TRUE,
+      options = list(
+        placeholder = placeholder,
+        onInitialize = I('function() { this.setValue(""); }')
+      )
     )
-  )
+  })
 }
 
 #' Check if multiple, or zero, rows are selected
