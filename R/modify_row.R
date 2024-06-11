@@ -11,16 +11,18 @@
 #' from auto-completed fields
 #' @param rows_selected Numeric vector; index of selected rows
 #' @param show_advanced Logical; should advanced input fields be displayed?
+#' @param credentials List; credentials passed from login
 #' @returns Value of `show_advanced` so this can be shared across modules
 #' @autoglobal
 #' @noRd
 modify_row_server <- function(
-    id, ppg, rows_selected, composed_name, show_advanced) {
+    id, ppg, rows_selected, composed_name, show_advanced, credentials) {
   # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
   stopifnot(is.reactive(show_advanced))
+  stopifnot(is.reactive(credentials))
 
   moduleServer(id, function(input, output, session) {
     # initiate error message
@@ -33,6 +35,7 @@ modify_row_server <- function(
       placeholder = "Select accepted name",
       col_select = "acceptedNameUsage",
       fill_name = TRUE,
+      credentials = credentials,
       TRUE
     )
 
@@ -43,6 +46,7 @@ modify_row_server <- function(
       placeholder = "Select parent name",
       col_select = "parentNameUsage",
       fill_name = TRUE,
+      credentials = credentials,
       !taxonRank %in% c("form", "subspecies", "variety")
     )
 

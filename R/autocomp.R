@@ -36,6 +36,7 @@ autocomplete_ui <- function(id, col_select, help_text) {
 #' @param rows_selected Reactive value; index of selected rows
 #' @param fill_name Logical; should the selected value in the menu be
 #'   auto-filled from the selected row?
+#' @param credentials List; credentials passed from login
 #' @param ... Passed to a filter() call to filter the rows of the ppg dataframe
 #'   to only the rows that should be used for providing items in the selectize
 #'   menu
@@ -46,7 +47,8 @@ autocomplete_server <- function(
     id, ppg, rows_selected,
     placeholder,
     col_select,
-    fill_name = FALSE, ...) {
+    fill_name = FALSE,
+    credentials, ...) {
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(!is.reactive(fill_name))
@@ -62,6 +64,7 @@ autocomplete_server <- function(
           sort()
       })
     observe({
+      shiny::req(credentials()$user_auth)
       choices <- accepted_higher_names()
       if (length(choices) > 0) {
         initialize_selectize_input(
@@ -117,6 +120,10 @@ autocomplete_app <- function() {
     textOutput("result")
   )
   server <- function(input, output, session) {
+    dwctaxon::dct_options(
+      user_name = "user",
+      user_id = "123"
+    )
     # Load data
     ppg <- load_data_server("ppg")
     # Set initial values
