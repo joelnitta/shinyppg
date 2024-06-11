@@ -65,12 +65,12 @@ ppg_app <- function() {
                 tabPanel(
                   "Add row",
                   compose_name_ui("sci_name_add"),
-                  data_entry_ui("add_row")
+                  data_entry_ui("add_row", "Add row")
                 ),
                 tabPanel(
                   "Edit row",
                   compose_name_ui("sci_name_modify"),
-                  data_entry_ui("modify_row")
+                  data_entry_ui("modify_row", "Modify row")
                 )
               ),
               hr(),

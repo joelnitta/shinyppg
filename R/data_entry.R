@@ -4,9 +4,10 @@
 #'
 #' @import shiny
 #' @param id Character vector of length 1; the ID for this module.
+#' @param apply_text Text to show on "apply" button
 #' @returns UI
 #' @noRd
-data_entry_ui <- function(id) {
+data_entry_ui <- function(id, apply_text = "Apply") {
   tagList(
     shinyjs::useShinyjs(),
     selectInput(
@@ -55,7 +56,7 @@ data_entry_ui <- function(id) {
       label = "parentNameUsageID"
     )),
     hr(),
-    actionButton(NS(id, "apply"), "Apply"),
+    actionButton(NS(id, "apply"), apply_text),
     textOutput(NS(id, "error_msg"))
   )
 }
