@@ -63,7 +63,6 @@ compose_name_server <- function(
   stopifnot(!is.reactive(fill_sci_name))
 
   moduleServer(id, function(input, output, session) {
-    ns <- session$ns
 
     # Update scientific name from composed input
     observeEvent(input$scientificName, {
