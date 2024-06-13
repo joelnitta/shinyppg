@@ -70,6 +70,8 @@ modify_row_server <- function(
             parentNameUsageID = null_if_blank(input$parentNameUsageID),
             parentNameUsage = null_if_blank(parentNameUsage())
           )
+          # Save patch for undoing
+          save_patch(data_original = ppg(), data_changed = updated_data)
           ppg(updated_data)
         },
         error = function(e) {
