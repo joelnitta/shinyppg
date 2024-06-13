@@ -1,5 +1,8 @@
 # Define vectors used in the app ----
 
+# Define an environment to store global variables
+.my_globals <- new.env(parent = emptyenv())
+
 # Valide Darwin Core (DwC) Taxon terms (columns)
 dct_terms <- dwctaxon::dct_terms
 
@@ -90,7 +93,10 @@ load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
   if (data_source == "local") {
     return(shinyppg::ppg_small)
   }
-  readr::read_csv(url, col_select = dplyr::any_of(cols_select))
+  ppg <- readr::read_csv(url, col_select = dplyr::any_of(cols_select)) |>
+    as.data.frame()
+  attributes(ppg)$spec <- NULL
+  return(ppg)
 }
 
 #' Load IPNI authors
@@ -138,7 +144,7 @@ update_selectize_compose_name <- function(
     session, inputId, choices, placeholder, credentials) {
   shiny::observe({
     shiny::req(credentials()$user_auth)
-      updateSelectizeInput(
+    updateSelectizeInput(
       session = session,
       inputId = inputId,
       choices = choices,
@@ -277,6 +283,43 @@ initial_validate <- function(ppg) {
 #'
 #' @noRd
 select_sort_col <- function(ppg, col_name) {
-  if (!col_name %in% colnames(ppg)) return(NULL)
+  if (!col_name %in% colnames(ppg)) {
+    return(NULL)
+  }
   which(colnames(ppg) == col_name) - 1
+}
+
+# Function to set a global variable
+set_global <- function(name, value) {
+  assign(name, value, envir = .my_globals)
+}
+
+get_patch_list <- function() {
+  if (exists("global_patch_list", envir = .my_globals)) {
+    get("global_patch_list", envir = .my_globals)
+  } else {
+    set_global("global_patch_list", NULL)
+    return(NULL)
+  }
+}
+
+save_patch <- function(data_original, data_changed) {
+  patch_list <- get_patch_list()
+  new_patch <- daff::diff_data(
+    data_ref = data_changed,
+    data = data_original
+  )
+  patch_list <- c(patch_list, list(new_patch))
+  set_global("global_patch_list", patch_list)
+  invisible()
+}
+
+undo_change <- function(data) {
+  patch_list <- get_patch_list()
+  last_patch_i <- length(patch_list)
+  patch_to_apply <- patch_list[[last_patch_i]]
+  res <- daff::patch_data(data, patch_to_apply)
+  patch_list[last_patch_i] <- NULL
+  set_global("global_patch_list", patch_list)
+  return(res)
 }

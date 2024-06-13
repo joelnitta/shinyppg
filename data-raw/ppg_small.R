@@ -33,13 +33,18 @@ data_species <- data_subspecies |>
 
 # combine into test dataset
 ppg_small <-
-  bind_rows(data_subspecies, data_species, data_genus_above)
-
-ppg_small |>
+  bind_rows(data_subspecies, data_species, data_genus_above) |>
+  # TODO remove this once `modifiedBy` and `modifiedByID` are in original PPG
+  dplyr::mutate(
+    modified = as.character(modified),
+    modifiedBy = NA_character_,
+    modifiedByID = NA_character_
+  ) |>
   # should pass using the same checks as the full dataset
   dwctaxon::dct_validate(
-    valid_tax_status = "accepted, synonym, ambiguous synonym",
-    check_sci_name = FALSE) |>
+    valid_tax_status = "variant, accepted, synonym, ambiguous synonym",
+    check_sci_name = FALSE
+  ) |>
   assertr::assert(in_set(ranks), taxonRank)
 
 usethis::use_data(ppg_small, overwrite = TRUE)
