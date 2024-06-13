@@ -74,7 +74,9 @@ ppg_app <- function() {
                 )
               ),
               hr(),
-              delete_row_ui("delete_row")
+              delete_row_ui("delete_row"),
+              hr(),
+              undo_ui("undo")
             ),
             mainPanel(
               display_ppg_ui("display_ppg")
@@ -119,6 +121,7 @@ ppg_app <- function() {
     )
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
+    undo_server("undo", ppg)
   }
 
   shiny::shinyApp(ui, server)

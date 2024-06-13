@@ -37,6 +37,8 @@ delete_row_server <- function(id, ppg, rows_selected) {
           ppg(),
           taxonID = selected_taxonID
         )
+        # Save patch for undoing
+        save_patch(data_original = ppg(), data_changed = updated_data)
         ppg(updated_data)
       }
     })

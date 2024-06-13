@@ -90,7 +90,10 @@ load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
   if (data_source == "local") {
     return(shinyppg::ppg_small)
   }
-  readr::read_csv(url, col_select = dplyr::any_of(cols_select))
+  ppg <- readr::read_csv(url, col_select = dplyr::any_of(cols_select)) |>
+    as.data.frame()
+  attributes(ppg)$spec <- NULL
+  return(ppg)
 }
 
 #' Load IPNI authors
@@ -138,7 +141,7 @@ update_selectize_compose_name <- function(
     session, inputId, choices, placeholder, credentials) {
   shiny::observe({
     shiny::req(credentials()$user_auth)
-      updateSelectizeInput(
+    updateSelectizeInput(
       session = session,
       inputId = inputId,
       choices = choices,
@@ -277,6 +280,111 @@ initial_validate <- function(ppg) {
 #'
 #' @noRd
 select_sort_col <- function(ppg, col_name) {
-  if (!col_name %in% colnames(ppg)) return(NULL)
+  if (!col_name %in% colnames(ppg)) {
+    return(NULL)
+  }
   which(colnames(ppg) == col_name) - 1
+}
+
+# Undo ----
+
+#' Create envir to hold global vars on package load
+#' and load dwctaxon
+#'
+#' Internal function
+#'
+#' @noRd
+.onLoad <- function(libname, pkgname) {
+  # Create .shinyppg_globals if it does not yet exist
+  # delete any existing .shinyppg_globals that does exist first
+  env_name <- ".shinyppg_globals"
+
+  if (exists(env_name, envir = .GlobalEnv, inherits = FALSE)) {
+    rm(list = env_name, envir = .GlobalEnv)
+    packageStartupMessage("Environment '", env_name, "' has been removed.")
+  }
+  assign(env_name, new.env(), envir = .GlobalEnv)
+  packageStartupMessage("Environment '", env_name, "' has been created.")
+
+  # Load dwctaxon namespace so we can access objects like dct_terms
+  requireNamespace("dwctaxon", quietly = TRUE)
+}
+
+#' Set a global variable
+#'
+#' Internal function
+#'
+#' @param name Name of object
+#' @param value Value to assign to object
+#'
+#' @return Nothing; run for its side effect
+#'
+#' @noRd
+set_global <- function(name, value) {
+  assign(name, value, envir = .shinyppg_globals)
+  invisible()
+}
+
+#' Get list of patches
+#'
+#' The patches in the list can be used to restore the ppg dataframe (undo the
+#' last change made to the dataframe)
+#'
+#' Internal function
+#'
+#' @return List of patches, if any exist
+#'
+#' @noRd
+get_patch_list <- function() {
+  if (exists("global_patch_list", envir = .shinyppg_globals)) {
+    get("global_patch_list", envir = .shinyppg_globals)
+  } else {
+    set_global("global_patch_list", NULL)
+    return(NULL)
+  }
+}
+
+#' Save a patch
+#'
+#' The patches in the list can be used to restore the ppg dataframe (undo the
+#' last change made to the dataframe)
+#'
+#' Internal function
+#'
+#' @param data_original Original dataframe
+#' @param data_changed Changed dataframe
+#'
+#' @return Nothing; called for its side effect, which is to add a patch to
+#' the global list of patches.
+#'
+#' @noRd
+save_patch <- function(data_original, data_changed) {
+  patch_list <- get_patch_list()
+  new_patch <- daff::diff_data(
+    data_ref = data_changed,
+    data = data_original
+  )
+  patch_list <- c(patch_list, list(new_patch))
+  set_global("global_patch_list", patch_list)
+  invisible()
+}
+
+#' Undo the last change made to ppg
+#'
+#' Internal function
+#'
+#' @param data The modified ppg dataframe
+#'
+#' @return ppg dataframe, with the most recent change undone. Also removes
+#' the most recent patch from the global patch list
+#'
+#' @noRd
+undo_change <- function(data) {
+  patch_list <- get_patch_list()
+  last_patch_i <- length(patch_list)
+  patch_to_apply <- patch_list[[last_patch_i]]
+  res <- daff::patch_data(data, patch_to_apply)
+  patch_list[last_patch_i] <- NULL
+  set_global("global_patch_list", patch_list)
+  return(res)
 }
