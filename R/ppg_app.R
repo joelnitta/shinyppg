@@ -34,6 +34,7 @@ ppg_app <- function() {
     composed_name_add <- reactiveVal("")
     composed_name_modify <- reactiveVal("")
     show_advanced <- reactiveVal(FALSE)
+    ppg_remaining <- reactiveVal(data.frame())
 
     # Call login module
     credentials <- login_server(
@@ -71,6 +72,10 @@ ppg_app <- function() {
                   "Edit row",
                   compose_name_ui("sci_name_modify"),
                   data_entry_ui("modify_row", "Modify row")
+                ),
+                tabPanel(
+                  "Subset data",
+                  subset_ui("subset")
                 )
               ),
               hr(),
@@ -122,6 +127,12 @@ ppg_app <- function() {
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
     undo_server("undo", ppg)
+    subset_server(
+      id = "subset",
+      ppg = ppg,
+      ppg_remaining = ppg_remaining,
+      credentials = credentials
+    )
   }
 
   shiny::shinyApp(ui, server)

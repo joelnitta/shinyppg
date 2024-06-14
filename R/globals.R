@@ -5,6 +5,20 @@ utils::globalVariables(c(
   "taxonomicStatus", # <autocomplete_server>
   "scientificName", # <autocomplete_server>
   "taxonRank", # <autocomplete_app>
+  "scientificName", # <fetch_single_parent>
+  "parentNameUsageID", # <fetch_single_parent>
+  "taxonID", # <fetch_parents>
+  "scientificName", # <fetch_synonyms>
+  "taxonID", # <fetch_synonyms>
+  "scientificName", # <fetch_children_one_level_single>
+  "taxonID", # <fetch_children_one_level_single>
+  "taxonomicStatus", # <fetch_children>
+  "scientificName", # <fetch_children>
+  "taxonID", # <fetch_children>
+  "scientificName", # <subset_to_taxon_single>
+  "taxonID", # <subset_to_taxon_single>
   "taxonRank", # <modify_row_server>
+  "taxonRank", # <subset_server>
+  "scientificName", # <subset_server>
   NULL
 ))

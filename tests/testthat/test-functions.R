@@ -42,3 +42,31 @@ test_that("undo works", {
   expect_equal(ppg, recovered_ppg)
   dwctaxon::dct_options(reset = TRUE)
 })
+
+test_that("subsetting to taxonomic group works on single taxon", {
+  crep_data <- subset_to_taxon(ppg_small, "Crepidomanes (C. Presl) C. Presl")
+  expect_snapshot(crep_data)
+  expect_no_error(
+    dct_validate(
+      crep_data,
+      extra_cols = c("modifiedBy", "modifiedByID")
+    )
+  )
+})
+
+test_that("subsetting to taxonomic group works on multiple taxa", {
+  sub_data <- subset_to_taxon(
+    ppg_small, c(
+      "Crepidomanes (C. Presl) C. Presl",
+      "Abrodictyum C. Presl"
+    )
+  )
+  expect_snapshot(sub_data)
+  expect_no_error(
+    dct_validate(
+      sub_data,
+      extra_cols = c("modifiedBy", "modifiedByID"),
+      on_success = "logical"
+    )
+  )
+})
