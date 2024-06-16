@@ -7,6 +7,7 @@
 #' @noRd
 subset_ui <- function(id) {
   tagList(
+    shinyjs::useShinyjs(),
     autocomplete_ui(
       NS(id, "order"),
       col_select = "Order",
@@ -53,6 +54,9 @@ subset_server <- function(
   stopifnot(is.reactive(ppg_remaining))
 
   moduleServer(id, function(input, output, session) {
+    # Initial state: not subset, so disable reset button
+    is_subset <- reactiveVal(FALSE)
+    shinyjs::disable("reset")
     order_select <- autocomplete_server(
       id = "order",
       ppg = ppg,
@@ -61,6 +65,7 @@ subset_server <- function(
       col_select = NULL,
       fill_name = FALSE,
       credentials = credentials,
+      switch_off = is_subset,
       taxonRank == "order"
     )
     family_select <- autocomplete_server(
@@ -71,6 +76,7 @@ subset_server <- function(
       col_select = NULL,
       fill_name = FALSE,
       credentials = credentials,
+      switch_off = is_subset,
       taxonRank == "family"
     )
     genus_select <- autocomplete_server(
@@ -81,13 +87,15 @@ subset_server <- function(
       col_select = NULL,
       fill_name = FALSE,
       credentials = credentials,
+      switch_off = is_subset,
       taxonRank == "genus"
     )
+    # Subset taxa
     observeEvent(input$subset, {
       taxa_selected <- unique(
         c(order_select(), family_select(), genus_select())
       )
-      if (length(taxa_selected) > 0) {
+      if (length(taxa_selected) > 0 && !is_subset()) {
         subsetted <- subset_to_taxon(ppg(), taxa_selected) |>
           dplyr::arrange(scientificName)
         other <- ppg() |>
@@ -99,17 +107,23 @@ subset_server <- function(
         set_global("global_patch_list", NULL)
         ppg(subsetted)
         ppg_remaining(other)
+        shinyjs::disable("subset")
+        shinyjs::enable("reset")
+        is_subset(TRUE)
       }
     })
     observeEvent(input$reset, {
-      if (nrow(ppg_remaining()) > 0) {
+      if (nrow(ppg_remaining()) > 0 && is_subset()) {
         full <- dplyr::bind_rows(ppg(), ppg_remaining()) |>
           unique() |>
           dplyr::arrange(scientificName)
         # reset patch list
         set_global("global_patch_list", NULL)
+        ppg(full)
+        shinyjs::enable("subset")
+        shinyjs::disable("reset")
+        is_subset(FALSE)
       }
-      ppg(full)
     })
   })
 }

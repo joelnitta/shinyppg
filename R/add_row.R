@@ -38,6 +38,7 @@ add_row_server <- function(
       col_select = "acceptedNameUsage",
       fill_name = FALSE,
       credentials = credentials,
+      switch_off = NULL,
       TRUE
     )
 
@@ -49,6 +50,7 @@ add_row_server <- function(
       col_select = "parentNameUsage",
       fill_name = FALSE,
       credentials = credentials,
+      switch_off = NULL,
       !taxonRank %in% c("form", "subspecies", "variety")
     )
 
