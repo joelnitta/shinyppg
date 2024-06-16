@@ -1,7 +1,7 @@
 # Encrypt passwords with sodium
 
 user_base <-
-  readr::read_csv("secrets.csv") |>
+  readr::read_csv("working/secrets.csv") |>
   dplyr::mutate(
     password = purrr::map_chr(password, sodium::password_store)
   )
