@@ -14,13 +14,13 @@
 #'   entry menu UI element
 #' @returns UI
 #' @noRd
-autocomplete_ui <- function(id, col_select, help_text) {
+autocomplete_ui <- function(id, col_select, help_text, multiple = FALSE) {
   tagList(
     selectizeInput(
       NS(id, "autocomp_col"),
       label = col_select,
       choices = NULL,
-      multiple = FALSE
+      multiple = multiple
     ),
     helpText(help_text)
   )
@@ -44,14 +44,19 @@ autocomplete_ui <- function(id, col_select, help_text) {
 #' @autoglobal
 #' @noRd
 autocomplete_server <- function(
-    id, ppg, rows_selected,
+    id,
+    ppg,
+    rows_selected,
     placeholder,
     col_select,
     fill_name = FALSE,
     credentials, ...) {
   stopifnot(is.reactive(ppg))
-  stopifnot(is.reactive(rows_selected))
   stopifnot(!is.reactive(fill_name))
+  if (fill_name) {
+    stopifnot(is.reactive(rows_selected))
+    stopifnot(!is.reactive(col_select))
+  }
 
   moduleServer(id, function(input, output, session) {
     accepted_higher_names <-
@@ -75,30 +80,32 @@ autocomplete_server <- function(
         )
       }
     })
-    # Fill in row editing text boxes with data from selected row
-    observeEvent(rows_selected(), {
-      if (length(rows_selected()) == 1 && fill_name) {
-        selected_row <- ppg()[rows_selected(), ]
-        initialize_selectize_input(
-          session = session,
-          choices = accepted_higher_names(),
-          placeholder = placeholder,
-          selected = selected_row[[col_select]][[1]]
-        )
-      }
-    })
-    # Reset row editing text boxes when zero or >1 rows selected
-    mult_or_no_rows_selected <- check_mult_or_no_rows_selected(rows_selected)
-    observeEvent(mult_or_no_rows_selected(), {
-      if (mult_or_no_rows_selected() && fill_name) {
-        initialize_selectize_input(
-          session = session,
-          choices = accepted_higher_names(),
-          placeholder = placeholder,
-          selected = ""
-        )
-      }
-    })
+    if (fill_name) {
+      # Fill in row editing text boxes with data from selected row
+      observeEvent(rows_selected(), {
+        if (length(rows_selected()) == 1 && fill_name) {
+          selected_row <- ppg()[rows_selected(), ]
+          initialize_selectize_input(
+            session = session,
+            choices = accepted_higher_names(),
+            placeholder = placeholder,
+            selected = selected_row[[col_select]][[1]]
+          )
+        }
+      })
+      # Reset row editing text boxes when zero or >1 rows selected
+      mult_or_no_rows_selected <- check_mult_or_no_rows_selected(rows_selected)
+      observeEvent(mult_or_no_rows_selected(), {
+        if (mult_or_no_rows_selected() && fill_name) {
+          initialize_selectize_input(
+            session = session,
+            choices = accepted_higher_names(),
+            placeholder = placeholder,
+            selected = ""
+          )
+        }
+      })
+    }
     reactive(input$autocomp_col)
   })
 }
