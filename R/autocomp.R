@@ -16,6 +16,7 @@
 #' @noRd
 autocomplete_ui <- function(id, col_select, help_text, multiple = FALSE) {
   tagList(
+    shinyjs::useShinyjs(),
     selectizeInput(
       NS(id, "autocomp_col"),
       label = col_select,
@@ -50,12 +51,16 @@ autocomplete_server <- function(
     placeholder,
     col_select,
     fill_name = FALSE,
+    switch_off = NULL,
     credentials, ...) {
   stopifnot(is.reactive(ppg))
   stopifnot(!is.reactive(fill_name))
   if (fill_name) {
     stopifnot(is.reactive(rows_selected))
     stopifnot(!is.reactive(col_select))
+  }
+  if (!is.null(switch_off)) {
+    stopifnot(is.reactive(switch_off))
   }
 
   moduleServer(id, function(input, output, session) {
@@ -80,6 +85,16 @@ autocomplete_server <- function(
         )
       }
     })
+    if (!is.null(switch_off)) {
+      observe({
+        if (switch_off()) {
+          shinyjs::disable("autocomp_col")
+        }
+        if (!switch_off()) {
+          shinyjs::enable("autocomp_col")
+        }
+      })
+    }
     if (fill_name) {
       # Fill in row editing text boxes with data from selected row
       observeEvent(rows_selected(), {

@@ -36,6 +36,7 @@ modify_row_server <- function(
       col_select = "acceptedNameUsage",
       fill_name = TRUE,
       credentials = credentials,
+      switch_off = NULL,
       TRUE
     )
 
@@ -47,6 +48,7 @@ modify_row_server <- function(
       col_select = "parentNameUsage",
       fill_name = TRUE,
       credentials = credentials,
+      switch_off = NULL,
       !taxonRank %in% c("form", "subspecies", "variety")
     )
 

@@ -66,22 +66,26 @@ ppg_app <- function() {
                 tabPanel(
                   "Add row",
                   compose_name_ui("sci_name_add"),
-                  data_entry_ui("add_row", "Add row")
+                  data_entry_ui("add_row", "Add row"),
+                  hr(),
+                  delete_row_ui("delete_row"),
+                  hr(),
+                  undo_ui("undo")
                 ),
                 tabPanel(
                   "Edit row",
                   compose_name_ui("sci_name_modify"),
-                  data_entry_ui("modify_row", "Modify row")
+                  data_entry_ui("modify_row", "Modify row"),
+                  hr(),
+                  delete_row_ui("delete_row"),
+                  hr(),
+                  undo_ui("undo")
                 ),
                 tabPanel(
                   "Subset data",
                   subset_ui("subset")
                 )
               ),
-              hr(),
-              delete_row_ui("delete_row"),
-              hr(),
-              undo_ui("undo")
             ),
             mainPanel(
               display_ppg_ui("display_ppg")
