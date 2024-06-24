@@ -103,21 +103,25 @@ ppg_app <- function() {
 
     # Other server logic
 
+    # - initial ppg table display
     rows_selected <- display_ppg_server("display_ppg", ppg)
     # - settings
     settings <- settings_server("settings")
+    # - name composer for adding a new name
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,
       composed_name_add, ppg, rows_selected,
       fill_sci_name = FALSE,
       credentials
     )
+    # - name composer for modifying a name
     compose_name_server(
       "sci_name_modify", higher_names, epithets, ipni_authors,
       composed_name_modify, ppg, rows_selected,
       fill_sci_name = TRUE,
       credentials
     )
+    # - add a name
     show_advanced <- add_row_server(
       id = "add_row",
       ppg = ppg,
@@ -126,6 +130,8 @@ ppg_app <- function() {
       show_advanced = show_advanced,
       credentials = credentials
     )
+    # - modify a name
+    cols_fill(subset_cols_to_fill(settings, cols_fill, cols_select))
     show_advanced <- modify_row_server(
       id = "modify_row",
       ppg = ppg,
@@ -135,9 +141,13 @@ ppg_app <- function() {
       credentials = credentials,
       cols_fill = cols_fill
     )
+    # - delete a name
     delete_row_server("delete_row", ppg, rows_selected)
+    # - run validation
     validate_server("validate", ppg)
+    # - undo the last change
     undo_server("undo", ppg)
+    # - subset data
     subset_server(
       id = "subset",
       ppg = ppg,
