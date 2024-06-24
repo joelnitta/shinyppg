@@ -35,6 +35,7 @@ ppg_app <- function() {
     composed_name_modify <- reactiveVal("")
     show_advanced <- reactiveVal(FALSE)
     ppg_remaining <- reactiveVal(data.frame())
+    cols_fill <- reactiveVal(cols_select)
 
     # Call login module
     credentials <- login_server(
@@ -93,13 +94,18 @@ ppg_app <- function() {
           )
         ),
         tabPanel("Data Validation", validate_ui("validate")),
-        tabPanel("Settings")
+        tabPanel(
+          "Settings",
+          settings_ui("settings")
+        )
       )
     })
 
     # Other server logic
 
     rows_selected <- display_ppg_server("display_ppg", ppg)
+    # - settings
+    settings <- settings_server("settings")
     compose_name_server(
       "sci_name_add", higher_names, epithets, ipni_authors,
       composed_name_add, ppg, rows_selected,
@@ -126,7 +132,8 @@ ppg_app <- function() {
       rows_selected = rows_selected,
       composed_name = composed_name_modify,
       show_advanced = show_advanced,
-      credentials = credentials
+      credentials = credentials,
+      cols_fill = cols_fill
     )
     delete_row_server("delete_row", ppg, rows_selected)
     validate_server("validate", ppg)
