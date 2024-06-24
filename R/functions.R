@@ -575,3 +575,36 @@ subset_to_taxon <- function(tax_dat, target_taxon) {
     unique()
   tax_dat[tax_dat$taxonID %in% target_ids, ]
 }
+
+#' Subset columns to autofill during row modification
+#'
+#' Internal function
+#'
+#' @param settings Output of settings_server(); a list of TRUE/FALSE
+#'   settings
+#' @param cols_fill Reactive value; vector of column names to autofill
+#'   when modifying data
+#' @param cols_default Vector of default column names to autofill
+#' @returns Updated reactive value cols_fill
+#' @autoglobal
+#' @noRd
+subset_cols_to_fill <- function(settings, cols_fill, cols_default) {
+  observeEvent(
+    settings$autofill_id(), {
+      if (settings$autofill_id()) {
+        cols_fill(cols_default)
+      } else {
+        cols_fill(
+          cols_default[
+            stringr::str_detect(
+              cols_default,
+              "acceptedNameUsageID|parentNameUsageID",
+              negate = TRUE
+            )
+          ]
+        )
+      }
+    }
+  )
+  cols_fill
+}
