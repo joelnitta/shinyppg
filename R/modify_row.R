@@ -12,17 +12,21 @@
 #' @param rows_selected Numeric vector; index of selected rows
 #' @param show_advanced Logical; should advanced input fields be displayed?
 #' @param credentials List; credentials passed from login
+#' @param cols_fill Vector of column names to auto-fill from ppg in the
+#' editor interface
 #' @returns Value of `show_advanced` so this can be shared across modules
 #' @autoglobal
 #' @noRd
 modify_row_server <- function(
-    id, ppg, rows_selected, composed_name, show_advanced, credentials) {
+    id, ppg, rows_selected, composed_name, show_advanced, credentials,
+    cols_fill, autofill_id) {
   # Check args
   stopifnot(is.reactive(ppg))
   stopifnot(is.reactive(rows_selected))
   stopifnot(is.reactive(composed_name))
   stopifnot(is.reactive(show_advanced))
   stopifnot(is.reactive(credentials))
+  stopifnot(is.reactive(cols_fill))
 
   moduleServer(id, function(input, output, session) {
     # initiate error message
@@ -87,8 +91,9 @@ modify_row_server <- function(
     observeEvent(rows_selected(), {
       if (length(rows_selected()) == 1) {
         selected_row <- ppg()[rows_selected(), ]
+        selected_cols <- cols_fill()
         purrr::walk(
-          cols_select,
+          selected_cols,
           ~ fill_data_entry_from_row(
             session = session,
             item = .x,

@@ -46,6 +46,8 @@ valid_tax_rank <- c(
 dwctaxon::dct_options(
   check_sci_name = FALSE,
   check_mapping_accepted_status = TRUE,
+  check_mapping_parent_accepted = TRUE,
+  remap_parent = TRUE,
   valid_tax_status = paste(valid_tax_status, collapse = ", "),
   stamp_modified_by = TRUE,
   stamp_modified_by_id = TRUE,
