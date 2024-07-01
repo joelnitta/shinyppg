@@ -32,11 +32,15 @@ set_asc_desc <- function(col_list) {
 #' @return Tibble
 #' @noRd
 load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
-  url <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
+
   if (data_source == "local") {
     return(shinyppg::ppg_small)
+  } else if (data_source == "repo") {
+    path <- "/ppg/data/ppg.csv"
+  } else {
+    path <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
   }
-  ppg <- readr::read_csv(url, col_select = dplyr::any_of(cols_select)) |>
+  ppg <- readr::read_csv(path, col_select = dplyr::any_of(cols_select)) |>
     as.data.frame()
   attributes(ppg)$spec <- NULL
   return(ppg)
