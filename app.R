@@ -1,6 +1,2 @@
-library(shiny)
-library(dwctaxon)
-library(shinyppg)
-options(shiny.host = '0.0.0.0')
-options(shiny.port = 80)
+pkgload::load_all(".")
 ppg_app()
