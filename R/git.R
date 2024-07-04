@@ -41,7 +41,7 @@ make_shinyppg_branch_name <- function(ppg_repo = "/ppg") {
 
 submit_changes <- function(
   ppg, ppg_path = "/ppg/data/ppg.csv", ppg_repo = "/ppg",
-  user, user_id, summary) {
+  user_name, user_id, summary, dry_run = FALSE) {
 
   # Check out new branch
   shinyppg_branch <- make_shinyppg_branch_name()
@@ -70,6 +70,10 @@ submit_changes <- function(
   )
 
   # Push branch
+  if (dry_run) {
+    return("Successfully committed and ready to push")
+  }
+
   gert::git_push(
     repo = ppg_repo,
     password = Sys.getenv("GITHUB_TOKEN"),
