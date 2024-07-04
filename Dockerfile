@@ -15,4 +15,5 @@ RUN git config --global user.email "ourPPG@googlegroups.com" && \
 # Set up app.R
 
 # Clone the repository when the container starts
-CMD git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/pteridogroup/ppg.git /ppg
+CMD git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/pteridogroup/ppg.git /ppg && \
+  bash
