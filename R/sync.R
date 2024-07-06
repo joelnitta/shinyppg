@@ -4,9 +4,7 @@
 sync_ui <- function(id) {
   tagList(
     textAreaInput(NS(id, "summary"), "Summary of changes"),
-    actionButton(NS(id, "push"), "Push Branch"),
-    textOutput(NS(id, "gh_token")),
-    textOutput(NS(id, "gh_user"))
+    actionButton(NS(id, "push"), "Push Branch")
   )
 }
 
@@ -29,12 +27,6 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
         ppg_repo = "/home/shiny/ppg"
       )
     })
-    token_check <- reactive(Sys.getenv("GITHUB_TOKEN"))
-    gh_user_check <- reactive(Sys.getenv("GITHUB_USER"))
-
-    output$gh_token <- renderText(token_check())
-    output$gh_user <- renderText(gh_user_check())
-
   })
 }
 
