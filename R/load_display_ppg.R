@@ -24,9 +24,9 @@ display_ppg_ui <- function(id) {
 #' @param id Character vector of length 1; the ID for this module.
 #' @returns Server logic
 #' @noRd
-load_data_server <- function(id) {
+load_data_server <- function(id, data_source = Sys.getenv("DATA_SOURCE")) {
   moduleServer(id, function(input, output, session) {
-    reactiveVal(load_data())
+    reactiveVal(load_data(data_source))
   })
 }
 
@@ -52,10 +52,12 @@ display_ppg_server <- function(id, ppg) {
       DT::renderDataTable(
         {
           DT::datatable(
-            data = ppg(),
+            data = ppg() |> linkize_urls("ipniURL"),
             rownames = FALSE,
             filter = "top",
             selection = "multiple",
+            # display ipniURL as a clickable link
+            escape = FALSE,
             options = list(
               order = list(
                 list(select_sort_col(ppg(), "modified"), "desc"),
@@ -134,7 +136,7 @@ display_ppg_app <- function() {
   )
   server <- function(input, output, session) {
     # Load data
-    ppg <- load_data_server("ppg")
+    ppg <- load_data_server("ppg", "repo")
     display_ppg_server("ppg_table", ppg)
   }
   shinyApp(ui, server)

@@ -1,3 +1,28 @@
+setup_repo <- function(ppg_repo) {
+  assertthat::assert_that(
+    isTRUE(Sys.getenv("GITHUB_USER") != ""),
+    msg = "GITHUB_USER missing"
+  )
+  assertthat::assert_that(
+    isTRUE(Sys.getenv("GITHUB_TOKEN") != ""),
+    msg = "GITHUB_TOKEN missing"
+  )
+  gert::git_clone(
+    url = glue::glue(
+      "https://{Sys.getenv('GITHUB_USER')}:{Sys.getenv('GITHUB_TOKEN')}@github.com/joelnitta/ppg-test.git"
+    ),
+    path = ppg_repo,
+    password = Sys.getenv("GITHUB_TOKEN")
+  )
+  # Set user
+  gert::git_config_set(
+    "user.email", "ourPPG@googlegroups.com", repo = ppg_repo)
+  # Set user
+  gert::git_config_set(
+    "user.name", "PPG Bot", repo = ppg_repo)
+  return(invisible())
+}
+
 make_commit_msg <- function(
   user_name = "Test User", user_id = "test123", summary = "Added a new name") {
   paste(
@@ -12,55 +37,91 @@ make_commit_msg <- function(
   )
 }
 
-make_shinyppg_branch_name <- function(ppg_repo = "/ppg") {
+# Make a unique branch name based on the user ID and number of branches
+# they've previously submitted
+#' @autoglobal
+make_shinyppg_branch_name <- function(user_id, ppg_repo = "/ppg") {
+  
+  # Make branch prefix based on user name
+  prefix <- glue::glue("{user_id}-")
+
+  # Fetch remote branches and prune
+  gert::git_fetch(
+    repo = ppg_repo,
+    prune = TRUE
+  )
+  
   # Get list of branches on the remote
   shinyppg_branches <- gert::git_branch_list(repo = ppg_repo) |>
     dplyr::filter(local == FALSE) |>
     dplyr::mutate(name = stringr::str_remove_all(name, "origin/")) |>
-    dplyr::filter(stringr::str_detect(name, "shinyppg-update-")) |>
+    dplyr::filter(stringr::str_detect(name, prefix)) |>
     dplyr::select(name)
 
-  # Early exit if no existing branches pushed by shinyppg
+  # Get most recent number
   if (nrow(shinyppg_branches) == 0) {
-    return("shinyppg-update-1")
+    most_recent_number <- 0
+  } else {
+    most_recent_number <-
+      shinyppg_branches |>
+      dplyr::mutate(
+        number = stringr::str_remove_all(name, prefix) |>
+          as.integer()
+        ) |>
+      dplyr::arrange(number) |>
+      dplyr::pull(number) |>
+      dplyr::last()
   }
 
-  # Otherwise, get most recent number and increment
-  most_recent_number <-
-    shinyppg_branches |>
-    dplyr::mutate(
-      number = stringr::str_remove_all(name, "shinyppg-update-") |>
-        as.integer()
-      ) |>
-    dplyr::arrange(number) |>
-    dplyr::pull(number) |>
-    dplyr::last()
-  
-  paste0("shinyppg-update-", most_recent_number + 1)
+  paste0(prefix, most_recent_number + 1)
 }
 
 submit_changes <- function(
   ppg, ppg_path = "/ppg/data/ppg.csv", ppg_repo = "/ppg",
   user_name, user_id, summary, dry_run = FALSE) {
+  
+  # Always write out in sci name alphabetic order
+  ppg <- dplyr::arrange(ppg, scientificName, taxonID)
+
+  # Switch back to main when done
+  on.exit(
+    gert::git_branch_checkout(
+      "main",
+      repo = ppg_repo
+    )
+  )
+
+  # Define paths
+  ppg_rel_path <- fs::path_rel(ppg_path, ppg_repo)
 
   # Check out new branch
-  shinyppg_branch <- make_shinyppg_branch_name()
-  gert::git_branch_create(
-    shinyppg_branch,
-    checkout = TRUE,
-    repo = ppg_repo)
+  shinyppg_branch <- make_shinyppg_branch_name(user_id, ppg_repo)
+
+  branch_already_exists <- gert::git_branch_exists(
+    shinyppg_branch, local = TRUE, repo = ppg_repo)
+
+  if (!branch_already_exists) {
+    gert::git_branch_create(
+      shinyppg_branch,
+      checkout = TRUE,
+      repo = ppg_repo)
+  } else {
+    gert::git_branch_checkout(
+      shinyppg_branch,
+      repo = ppg_repo
+    )
+  }
 
   # Write out updated ppg file
   readr::write_csv(ppg, ppg_path)
 
   # Stage file for pushing
-  ppg_rel_path <- fs::path_rel(ppg_path, ppg_repo)
   ppg_staged <- gert::git_add(ppg_rel_path, repo = ppg_repo) |>
     dplyr::pull("staged") |>
     dplyr::first()
   assertthat::assert_that(
     isTRUE(ppg_staged),
-    msg = "Could not stage ppg"
+    msg = "Could not stage ppg; maybe the data haven't changed"
   )
 
   # Make commit
@@ -71,8 +132,16 @@ submit_changes <- function(
 
   # Push branch
   if (dry_run) {
-    return("Successfully committed and ready to push")
+    message("Everything looks good, resetting repo now")
+    gert::git_branch_checkout("main", repo = ppg_repo)
+    gert::git_branch_delete(shinyppg_branch, repo = ppg_repo)
+    return(invisible())
   }
+
+  assertthat::assert_that(
+    isTRUE(Sys.getenv("GITHUB_TOKEN") != ""),
+    msg = "Must provide GITHUB_TOKEN as an environmental variable to push"
+  )
 
   gert::git_push(
     repo = ppg_repo,

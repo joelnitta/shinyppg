@@ -36,11 +36,14 @@ load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
   if (data_source == "local") {
     return(shinyppg::ppg_small)
   } else if (data_source == "repo") {
-    path <- "/ppg/data/ppg.csv"
+    if (!fs::dir_exists("/home/shiny/ppg")) {
+      setup_repo("/home/shiny/ppg")
+    } # TODO: fetch and fast-forward main if repo already exists
+    path <- "/home/shiny/ppg/data/ppg.csv"
   } else {
     path <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
   }
-  ppg <- readr::read_csv(path, col_select = dplyr::any_of(cols_select)) |>
+  ppg <- readr::read_csv(path, col_types = readr::cols(.default = readr::col_character())) |>
     as.data.frame()
   attributes(ppg)$spec <- NULL
   return(ppg)
@@ -611,4 +614,31 @@ subset_cols_to_fill <- function(settings, cols_fill, cols_default) {
     }
   )
   cols_fill
+}
+
+#' Turn URLs into hyperlinks
+#'
+#' Internal function
+#'
+#' @param url Vector of URLs
+#' @returns Vector with URLs as hyperlinks
+#' @autoglobal
+linkize_url_col <- function(url) {
+  url <- glue::glue('<a href="{url}" target="_blank">{url}</a>') |>
+    as.character()
+  url[stringr::str_detect(url, "\\>NA\\<")] <- NA_character_
+  url
+}
+
+#' Turn URLs into hyperlinks in the ppg dataframe
+#'
+#' Internal function
+#'
+#' @param ppg PPG datafame
+#' @param url_cols Names of columns with URLs
+#' @returns ppg with URL columns formatted as links
+#' @autoglobal
+linkize_urls <- function(ppg, url_cols) {
+  ppg |>
+    dplyr::mutate(dplyr::across(dplyr::all_of(url_cols), linkize_url_col))
 }

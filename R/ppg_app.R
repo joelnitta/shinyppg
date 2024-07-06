@@ -24,8 +24,8 @@ ppg_app <- function() {
   )
 
   server <- function(input, output, session) {
-    # Load data
-    ppg <- load_data_server("ppg")
+    # Load data from repo (must be running from docker container)
+    ppg <- load_data_server("ppg", "repo")
     higher_names <- load_pterido_higher_names()
     epithets <- load_pterido_sp_epithets()
     ipni_authors <- load_authors()
@@ -94,6 +94,7 @@ ppg_app <- function() {
           )
         ),
         tabPanel("Data Validation", validate_ui("validate")),
+        tabPanel("Save and Submit", sync_ui("sync")),
         tabPanel(
           "Settings",
           settings_ui("settings")
@@ -153,6 +154,13 @@ ppg_app <- function() {
       ppg = ppg,
       ppg_remaining = ppg_remaining,
       credentials = credentials
+    )
+    # - submit changes
+    sync_server(
+      "sync",
+      ppg,
+      credentials,
+      dry_run = FALSE
     )
   }
 
