@@ -17,7 +17,8 @@ cols_select <- c(
   "parentNameUsageID",
   "modified",
   "modifiedBy",
-  "modifiedByID"
+  "modifiedByID",
+  "ipniURL"
 )
 
 # Valid values to use for taxonomicStatus
@@ -51,7 +52,7 @@ dwctaxon::dct_options(
   valid_tax_status = paste(valid_tax_status, collapse = ", "),
   stamp_modified_by = TRUE,
   stamp_modified_by_id = TRUE,
-  extra_cols = c("modifiedBy", "modifiedByID")
+  extra_cols = c("ipniURL", "modifiedBy", "modifiedByID")
 )
 
 # Create environment to store data across functions (used for patch list)
