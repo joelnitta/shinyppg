@@ -28,6 +28,8 @@ docker run --rm -it \
 
 Inside the container, run `/usr/bin/shiny-start.sh` to start the shiny app.
 
+Attach a VS Code session to the running container (for some reason, if you don't do this, the env vars won't get passed correctly (T_T)​ ​ )
+
 Navigate to <http://localhost:3838/> to access the app.
 
 Kill the shiny-server with ctrl+c and re-run it as necessary during development to refresh with the latest code.
