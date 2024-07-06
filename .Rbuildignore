@@ -9,3 +9,7 @@
 ^working$
 ^Dockerfile$
 ^ploomber$
+^shiny-start\.sh$
+^\.env$
+^\.load-env\.sh$
+^\.vscode$

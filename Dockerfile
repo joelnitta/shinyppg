@@ -8,12 +8,11 @@ RUN install2.r pak
 
 RUN R -q -e 'pak::pak(c("devtools", "joelnitta/shinyppg"))'
 
-# Set up git
-RUN git config --global user.email "ourPPG@googlegroups.com" && \
-  git config --global user.name "PPG Bot"
+# Copy the start script to the image
+COPY shiny-start.sh /usr/bin/shiny-start.sh
 
-# Set up app.R
+# Ensure the start script has execute permissions
+RUN chmod +x /usr/bin/shiny-start.sh
 
-# Clone the repository when the container starts
-CMD git clone https://${GITHUB_USER}:${GITHUB_TOKEN}@github.com/joelnitta/ppg-test.git /ppg && \
-  bash
+# Start the application
+CMD ["/usr/bin/shiny-start.sh"]
