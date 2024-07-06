@@ -4,3 +4,4 @@ secrets.csv
 working
 .DS_Store
 .env
+.vscode
