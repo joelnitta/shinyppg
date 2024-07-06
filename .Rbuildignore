@@ -13,3 +13,4 @@
 ^\.env$
 ^\.load-env\.sh$
 ^\.vscode$
+^\.dockerignore$
