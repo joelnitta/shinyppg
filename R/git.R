@@ -1,4 +1,9 @@
-setup_repo <- function(ppg_repo) {
+#' Clone the ppg repo (including the ppg dataset)
+setup_repo <- function(
+  ppg_repo = "/home/shiny/ppg",
+  github_user = "joelnitta",
+  repo_name = "ppg-test"
+  ) {
   assertthat::assert_that(
     isTRUE(Sys.getenv("GITHUB_USER") != ""),
     msg = "GITHUB_USER missing"
@@ -7,9 +12,14 @@ setup_repo <- function(ppg_repo) {
     isTRUE(Sys.getenv("GITHUB_TOKEN") != ""),
     msg = "GITHUB_TOKEN missing"
   )
+  assertthat::assert_that(
+    !fs::dir_exists(repo_name),
+    msg = "Target repo already exists; can't clone"
+  )
   gert::git_clone(
     url = glue::glue(
-      "https://{Sys.getenv('GITHUB_USER')}:{Sys.getenv('GITHUB_TOKEN')}@github.com/joelnitta/ppg-test.git"
+      "https://{Sys.getenv('GITHUB_USER')}:{Sys.getenv('GITHUB_TOKEN')}\\
+      @github.com/{github_user}/{repo_name}.git"
     ),
     path = ppg_repo,
     password = Sys.getenv("GITHUB_TOKEN")
