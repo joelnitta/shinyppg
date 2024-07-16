@@ -33,10 +33,14 @@ setup_repo <- function(
   return(invisible())
 }
 
+#' Make a commit message for a user's working session
+#'
 make_commit_msg <- function(
-  user_name = "Test User", user_id = "test123", summary = "Added a new name") {
+  user_name = "Test User", user_id = "test123",
+  title = "A title",
+  summary = "Added a new name") {
   paste(
-    "Update from shinyppg",
+    title,
     "\n\n",
     "user_name: ", user_name,
     "\n",
