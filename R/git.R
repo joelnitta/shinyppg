@@ -1,9 +1,8 @@
 #' Clone the ppg repo (including the ppg dataset)
 setup_repo <- function(
-  ppg_repo = "/home/shiny/ppg",
-  github_user = "joelnitta",
-  repo_name = "ppg-test"
-  ) {
+    ppg_repo = "/home/shiny/ppg",
+    github_user = "joelnitta",
+    repo_name = "ppg-test") {
   assertthat::assert_that(
     isTRUE(Sys.getenv("GITHUB_USER") != ""),
     msg = "GITHUB_USER missing"
@@ -26,19 +25,23 @@ setup_repo <- function(
   )
   # Set user
   gert::git_config_set(
-    "user.email", "ourPPG@googlegroups.com", repo = ppg_repo)
+    "user.email", "ourPPG@googlegroups.com",
+    repo = ppg_repo
+  )
   # Set user
   gert::git_config_set(
-    "user.name", "PPG Bot", repo = ppg_repo)
+    "user.name", "PPG Bot",
+    repo = ppg_repo
+  )
   return(invisible())
 }
 
 #' Make a commit message for a user's working session
 #'
 make_commit_msg <- function(
-  user_name = "Test User", user_id = "test123",
-  title = "A title",
-  summary = "Added a new name") {
+    user_name = "Test User", user_id = "test123",
+    title = "A title",
+    summary = "Added a new name") {
   paste(
     title,
     "\n\n",
@@ -59,7 +62,7 @@ extract_session_title <- function(message) {
     message,
     "^(.*)\n"
   ) |>
-  purrr::map_chr(2)
+    purrr::map_chr(2)
 }
 
 #' Helper function for summarize_branches()
@@ -71,13 +74,12 @@ extract_session_summary <- function(message) {
     message,
     "\nsummary: (.*)$"
   ) |>
-  purrr::map_chr(2)
+    purrr::map_chr(2)
 }
 
 # Summarize the branches opened by a particular user
 #' @autoglobal
 summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
-
   # Fetch remote branches and prune
   gert::git_fetch(
     repo = ppg_repo,
@@ -98,14 +100,14 @@ summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
 
   # For each branch, get and parse latest commit
   purrr::map_df(
-    user_branches, ~gert::git_log(ref = ., repo = ppg_repo, max = 1)) |>
+    user_branches, ~ gert::git_log(ref = ., repo = ppg_repo, max = 1)
+  ) |>
     dplyr::mutate(
       branch = user_branches,
       session_title = extract_session_title(message),
       session_summary = extract_session_summary(message),
-      ) |>
+    ) |>
     dplyr::select(branch, session_title, session_summary)
-
 }
 
 # Make a unique branch name based on the user ID and timestamp
@@ -118,9 +120,9 @@ make_shinyppg_branch_name <- function(user_id) {
 }
 
 submit_changes <- function(
-  ppg, ppg_path = "/home/shiny/ppg/data/ppg.csv", ppg_repo = "/home/shiny/ppg",
-  user_name, user_id, summary, dry_run = FALSE) {
-
+    ppg, ppg_path = "/home/shiny/ppg/data/ppg.csv",
+    ppg_repo = "/home/shiny/ppg",
+    user_name, user_id, title, summary, dry_run = FALSE) {
   # Always write out in sci name alphabetic order
   ppg <- dplyr::arrange(ppg, scientificName, taxonID)
 
@@ -139,13 +141,16 @@ submit_changes <- function(
   shinyppg_branch <- make_shinyppg_branch_name(user_id)
 
   branch_already_exists <- gert::git_branch_exists(
-    shinyppg_branch, local = TRUE, repo = ppg_repo)
+    shinyppg_branch,
+    local = TRUE, repo = ppg_repo
+  )
 
   if (!branch_already_exists) {
     gert::git_branch_create(
       shinyppg_branch,
       checkout = TRUE,
-      repo = ppg_repo)
+      repo = ppg_repo
+    )
   } else {
     gert::git_branch_checkout(
       shinyppg_branch,
@@ -167,7 +172,12 @@ submit_changes <- function(
 
   # Make commit
   ppg_commited <- gert::git_commit(
-    message = make_commit_msg(user_name, user_id, summary),
+    message = make_commit_msg(
+      user_name = user_name,
+      user_id = user_id,
+      title = title,
+      summary = summary
+    ),
     repo = ppg_repo
   )
 

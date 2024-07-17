@@ -3,6 +3,7 @@
 #' @noRd
 sync_ui <- function(id) {
   tagList(
+    textAreaInput(NS(id, "title"), "Session title"),
     textAreaInput(NS(id, "summary"), "Summary of changes"),
     actionButton(NS(id, "push"), "Push Branch")
   )
@@ -21,6 +22,7 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
         ppg = ppg(),
         user_name = credentials()$info$name,
         user_id = credentials()$info$user,
+        title = input$title,
         summary = input$summary,
         dry_run = dry_run,
         ppg_path = "/home/shiny/ppg/data/ppg.csv",
