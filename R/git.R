@@ -72,22 +72,13 @@ make_shinyppg_branch_name <- function(user_id, ppg_repo = "/ppg") {
     dplyr::filter(stringr::str_detect(name, prefix)) |>
     dplyr::select(name)
 
-  # Get most recent number
-  if (nrow(shinyppg_branches) == 0) {
-    most_recent_number <- 0
-  } else {
-    most_recent_number <-
-      shinyppg_branches |>
-      dplyr::mutate(
-        number = stringr::str_remove_all(name, prefix) |>
-          as.integer()
-        ) |>
-      dplyr::arrange(number) |>
-      dplyr::pull(number) |>
-      dplyr::last()
-  }
+# Make a unique branch name based on the user ID and timestamp
+make_shinyppg_branch_name <- function(user_id) {
+  # Make sure time is UTC
+  current_time_utc <- Sys.time()
+  attr(current_time_utc, "tzone") <- "UTC"
 
-  paste0(prefix, most_recent_number + 1)
+  glue::glue("{user_id}-{format(current_time_utc, '%y%m%d-%H%M%S')}")
 }
 
 submit_changes <- function(
