@@ -41,7 +41,7 @@ load_data <- function(data_source = Sys.getenv("DATA_SOURCE")) {
     } # TODO: fetch and fast-forward main if repo already exists
     path <- "/home/shiny/ppg/data/ppg.csv"
   } else {
-    path <- "https://www.dolthub.com/csv/joelnitta/ppg-test/main/ppg?include_bom=0"
+    path <- "https://raw.githubusercontent.com/joelnitta/ppg-test/main/data/ppg.csv"
   }
   ppg <- readr::read_csv(path, col_types = readr::cols(.default = readr::col_character())) |>
     as.data.frame()
