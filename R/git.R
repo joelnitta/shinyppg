@@ -118,9 +118,9 @@ make_shinyppg_branch_name <- function(user_id) {
 }
 
 submit_changes <- function(
-  ppg, ppg_path = "/ppg/data/ppg.csv", ppg_repo = "/ppg",
+  ppg, ppg_path = "/home/shiny/ppg/data/ppg.csv", ppg_repo = "/home/shiny/ppg",
   user_name, user_id, summary, dry_run = FALSE) {
-  
+
   # Always write out in sci name alphabetic order
   ppg <- dplyr::arrange(ppg, scientificName, taxonID)
 
@@ -136,7 +136,7 @@ submit_changes <- function(
   ppg_rel_path <- fs::path_rel(ppg_path, ppg_repo)
 
   # Check out new branch
-  shinyppg_branch <- make_shinyppg_branch_name(user_id, ppg_repo)
+  shinyppg_branch <- make_shinyppg_branch_name(user_id)
 
   branch_already_exists <- gert::git_branch_exists(
     shinyppg_branch, local = TRUE, repo = ppg_repo)
