@@ -51,26 +51,62 @@ make_commit_msg <- function(
   )
 }
 
-# Make a unique branch name based on the user ID and number of branches
-# they've previously submitted
+#' Helper function for summarize_branches()
+#'
+#' The session title should be the first line of the commit message
+extract_session_title <- function(message) {
+  stringr::str_match_all(
+    message,
+    "^(.*)\n"
+  ) |>
+  purrr::map_chr(2)
+}
+
+#' Helper function for summarize_branches()
+#'
+#' The session title should be the last part of the commit message, after
+#' 'summary:'
+extract_session_summary <- function(message) {
+  stringr::str_match_all(
+    message,
+    "\nsummary: (.*)$"
+  ) |>
+  purrr::map_chr(2)
+}
+
+# Summarize the branches opened by a particular user
 #' @autoglobal
-make_shinyppg_branch_name <- function(user_id, ppg_repo = "/ppg") {
-  
-  # Make branch prefix based on user name
-  prefix <- glue::glue("{user_id}-")
+summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
 
   # Fetch remote branches and prune
   gert::git_fetch(
     repo = ppg_repo,
     prune = TRUE
   )
-  
+
+  user_branch_pattern <- paste0(
+    user_id,
+    "-\\d{6}-\\d{6}$"
+  )
+
   # Get list of branches on the remote
-  shinyppg_branches <- gert::git_branch_list(repo = ppg_repo) |>
+  user_branches <- gert::git_branch_list(repo = ppg_repo) |>
     dplyr::filter(local == FALSE) |>
     dplyr::mutate(name = stringr::str_remove_all(name, "origin/")) |>
-    dplyr::filter(stringr::str_detect(name, prefix)) |>
-    dplyr::select(name)
+    dplyr::filter(stringr::str_detect(name, user_branch_pattern)) |>
+    dplyr::pull(name)
+
+  # For each branch, get and parse latest commit
+  purrr::map_df(
+    user_branches, ~gert::git_log(ref = ., repo = ppg_repo, max = 1)) |>
+    dplyr::mutate(
+      branch = user_branches,
+      session_title = extract_session_title(message),
+      session_summary = extract_session_summary(message),
+      ) |>
+    dplyr::select(branch, session_title, session_summary)
+
+}
 
 # Make a unique branch name based on the user ID and timestamp
 make_shinyppg_branch_name <- function(user_id) {
