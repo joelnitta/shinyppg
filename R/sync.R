@@ -69,6 +69,11 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
     stopifnot(is.reactive(credentials))
     stopifnot(is.reactive(ppg))
 
+    # Setup repo
+    if (!fs::dir_exists("/home/shiny/ppg")) {
+      setup_repo("/home/shiny/ppg")
+    }
+
     # Get initial branch
     current_branch <- reactiveVal(
       gert::git_branch(repo = "/home/shiny/ppg")
