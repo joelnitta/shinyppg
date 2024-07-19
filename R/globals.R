@@ -17,8 +17,12 @@ utils::globalVariables(c(
   "taxonID", # <fetch_children>
   "scientificName", # <subset_to_taxon_single>
   "taxonID", # <subset_to_taxon_single>
-  "name", # <make_shinyppg_branch_name>
-  "number", # <make_shinyppg_branch_name>
+  "name", # <summarize_branches>
+  "branch", # <summarize_branches>
+  "session_title", # <summarize_branches>
+  "session_summary", # <summarize_branches>
+  "scientificName", # <submit_changes>
+  "taxonID", # <submit_changes>
   "taxonRank", # <modify_row_server>
   "taxonRank", # <subset_server>
   "scientificName", # <subset_server>

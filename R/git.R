@@ -1,4 +1,11 @@
 #' Clone the ppg repo (including the ppg dataset)
+#'
+#' @param ppg_repo Path to clone the ppg repo.
+#' @param github_user Github username for the remote.
+#' @param repo_name Repo name of the remote.
+#'
+#' @return Nothing; called for its side-effect
+#' @noRd
 setup_repo <- function(
     ppg_repo = "/home/shiny/ppg",
     github_user = "joelnitta",
@@ -38,6 +45,8 @@ setup_repo <- function(
 
 #' Make a commit message for a user's working session
 #'
+#' @noRd
+#' @autoglobal
 make_commit_msg <- function(
     user_name = "Test User", user_id = "test123",
     title = "A title",
@@ -57,6 +66,12 @@ make_commit_msg <- function(
 #' Helper function for summarize_branches()
 #'
 #' The session title should be the first line of the commit message
+#'
+#' @param message Character vector; the commit message(s)
+#'
+#' @return Title of the commit message(s)
+#' @noRd
+#' @autoglobal
 extract_session_title <- function(message) {
   stringr::str_match_all(
     message,
@@ -69,6 +84,8 @@ extract_session_title <- function(message) {
 #'
 #' The session title should be the last part of the commit message, after
 #' 'summary:'
+#' @noRd
+#' @autoglobal
 extract_session_summary <- function(message) {
   stringr::str_match_all(
     message,
@@ -78,6 +95,7 @@ extract_session_summary <- function(message) {
 }
 
 # Summarize the branches opened by a particular user
+#' @noRd
 #' @autoglobal
 summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
   # Fetch remote branches and prune
@@ -111,6 +129,8 @@ summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
 }
 
 # Make a unique branch name based on the user ID and timestamp
+#' @noRd
+#' @autoglobal
 make_shinyppg_branch_name <- function(user_id) {
   # Make sure time is UTC
   current_time_utc <- Sys.time()
@@ -119,6 +139,9 @@ make_shinyppg_branch_name <- function(user_id) {
   glue::glue("{user_id}-{format(current_time_utc, '%y%m%d-%H%M%S')}")
 }
 
+#' Submit changes to GitHub
+#' @noRd
+#' @autoglobal
 submit_changes <- function(
     ppg, ppg_path = "/home/shiny/ppg/data/ppg.csv",
     ppg_repo = "/home/shiny/ppg",
