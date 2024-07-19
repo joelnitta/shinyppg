@@ -89,12 +89,17 @@ ppg_app <- function() {
               ),
             ),
             mainPanel(
-              display_ppg_ui("display_ppg")
+              display_ppg_ui("display_ppg"),
+              display_session_ui("branch") # TODO FIXME: this is not showing up
             )
           )
         ),
         tabPanel("Data Validation", validate_ui("validate")),
-        tabPanel("Save and Submit", sync_ui("sync")),
+        tabPanel(
+          "Manage Sessions",
+          sync_ui("sync"),
+          display_session_ui("branch")
+        ),
         tabPanel(
           "Settings",
           settings_ui("settings")
@@ -155,13 +160,14 @@ ppg_app <- function() {
       ppg_remaining = ppg_remaining,
       credentials = credentials
     )
-    # - submit changes
-    sync_server(
+    # - manage sessions
+    current_branch <- sync_server(
       "sync",
       ppg,
       credentials,
       dry_run = FALSE
     )
+    display_session_server("branch", current_branch)
   }
 
   shiny::shinyApp(ui, server)
