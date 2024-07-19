@@ -22,6 +22,27 @@ textInput2 <- function(inputId, label, value = "", width = NULL,
   }
 }
 
+#' UI for displaying current session name
+#' @autoglobal
+#' @noRd
+display_session_ui <- function(id) {
+  tagList(
+    textOutput(NS(id, "current_session"))
+  )
+}
+
+#' Server for displaying current session name
+#' @autoglobal
+#' @noRd
+display_session_server <- function(id, current_branch) {
+  moduleServer(id, function(input, output, session) {
+    stopifnot(is.reactive(current_branch))
+    output$current_session <- renderText(
+      paste("Current session:", current_branch())
+    )
+  })
+}
+
 #' UI for syncing
 #' @autoglobal
 #' @noRd
@@ -48,15 +69,22 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
     stopifnot(is.reactive(credentials))
     stopifnot(is.reactive(ppg))
 
-    # Summarize branches ----
-    branch_summary <- reactive(
-      summarize_branches(user_id = credentials()$info$user)
+    # Get initial branch
+    current_branch <- reactiveVal(
+      gert::git_branch(repo = "/home/shiny/ppg")
     )
 
+    # Summarize branches ----
+    branch_summary <- reactiveVal(tibble::tibble())
+
+    observe({
+      req(credentials())
+      branch_summary(summarize_branches(user_id = credentials()$info$user))
+    })
+
     observeEvent(input$refresh, {
-      branch_summary(
-        summarize_branches(user_id = credentials()$info$user)
-      )
+      req(credentials())
+      branch_summary(summarize_branches(user_id = credentials()$info$user))
     })
 
     output$session_table <- DT::renderDataTable({
@@ -69,16 +97,18 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
 
     # Load an existing session ----
     # length of selected_row() is 0 when nothing selected, 1 otherwise
-    selected_row <- reactive(
+    selected_row <- reactive({
       input$session_table_rows_selected
-    )
+    })
 
     observeEvent(input$load, {
+      req(selected_row())
       if (length(selected_row()) == 1) {
         load_existing_session(
           session_summary = branch_summary(),
           selected_row = selected_row()
         )
+        current_branch(gert::git_branch(repo = "/home/shiny/ppg"))
         # Load ppg
         ppg(load_data("repo"))
       }
@@ -86,17 +116,22 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
 
     # Start a new session ----
     observeEvent(input$new, {
+      req(credentials())
       # Checkout new branch (any unsaved changes will be lost)
       start_new_session(
         user_id = credentials()$info$user,
         ppg_path = "/home/shiny/ppg/data/ppg.csv",
-        ppg_repo = "/home/shiny/ppg")
+        ppg_repo = "/home/shiny/ppg"
+      )
+      current_branch(gert::git_branch(repo = "/home/shiny/ppg"))
       # Load ppg
       ppg(load_data("repo"))
     })
 
     # Save session ----
+    # (does not change branch)
     observeEvent(input$push, {
+      req(credentials())
       submit_changes(
         ppg = ppg(),
         user_name = credentials()$info$name,
@@ -108,6 +143,7 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
         ppg_repo = "/home/shiny/ppg"
       )
     })
+    return(current_branch)
   })
 }
 
@@ -120,7 +156,8 @@ sync_app <- function() {
       sidebarPanel(
         delete_row_ui("delete_row"),
         undo_ui("undo"),
-        sync_ui("sync")
+        sync_ui("sync"),
+        display_session_ui("branch")
       ),
       mainPanel(
         display_ppg_ui("display_ppg")
@@ -140,12 +177,13 @@ sync_app <- function() {
         )
       )
     )
-    sync_server(
+    current_branch <- sync_server(
       "sync",
       ppg = ppg,
       credentials = credentials,
       dry_run = FALSE
     )
+    display_session_server("branch", current_branch)
   }
   shinyApp(ui, server)
 }
