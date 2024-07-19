@@ -27,9 +27,16 @@ textInput2 <- function(inputId, label, value = "", width = NULL,
 #' @noRd
 sync_ui <- function(id) {
   tagList(
+    h3("Start a new session"),
+    actionButton(NS(id, "new"), "Start new session"),
+    h3("Load an existing session"),
+    DT::dataTableOutput(NS(id, "session_table"), width = "100%"),
+    actionButton(NS(id, "load"), "Load session"),
+    actionButton(NS(id, "refresh"), "Refresh session info"),
+    h3("Save current session"),
     textInput2(NS(id, "title"), "Session title", maxlength = 50),
     textAreaInput(NS(id, "summary"), "Summary of changes"),
-    actionButton(NS(id, "push"), "Push Branch")
+    actionButton(NS(id, "push"), "Save session")
   )
 }
 
@@ -41,6 +48,54 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
     stopifnot(is.reactive(credentials))
     stopifnot(is.reactive(ppg))
 
+    # Summarize branches ----
+    branch_summary <- reactive(
+      summarize_branches(user_id = credentials()$info$user)
+    )
+
+    observeEvent(input$refresh, {
+      branch_summary(
+        summarize_branches(user_id = credentials()$info$user)
+      )
+    })
+
+    output$session_table <- DT::renderDataTable({
+      DT::datatable(
+        rownames = FALSE,
+        selection = "single",
+        branch_summary()
+      )
+    })
+
+    # Load an existing session ----
+    # length of selected_row() is 0 when nothing selected, 1 otherwise
+    selected_row <- reactive(
+      input$session_table_rows_selected
+    )
+
+    observeEvent(input$load, {
+      if (length(selected_row()) == 1) {
+        load_existing_session(
+          session_summary = branch_summary(),
+          selected_row = selected_row()
+        )
+        # Load ppg
+        ppg(load_data("repo"))
+      }
+    })
+
+    # Start a new session ----
+    observeEvent(input$new, {
+      # Checkout new branch (any unsaved changes will be lost)
+      start_new_session(
+        user_id = credentials()$info$user,
+        ppg_path = "/home/shiny/ppg/data/ppg.csv",
+        ppg_repo = "/home/shiny/ppg")
+      # Load ppg
+      ppg(load_data("repo"))
+    })
+
+    # Save session ----
     observeEvent(input$push, {
       submit_changes(
         ppg = ppg(),

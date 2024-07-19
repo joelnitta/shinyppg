@@ -143,6 +143,58 @@ make_shinyppg_branch_name <- function(user_id) {
   glue::glue("{user_id}-{format(current_time_utc, '%y%m%d-%H%M%S')}")
 }
 
+# Start a new session (ie, checkout a new branch)
+#' @noRd
+#' @autoglobal
+start_new_session <- function(
+    user_id,
+    ppg_path = "/home/shiny/ppg/data/ppg.csv",
+    ppg_repo = "/home/shiny/ppg") {
+
+  # Start from main
+  gert::git_branch_checkout(
+    branch = "main",
+    force = TRUE,
+    repo = ppg_repo
+  )
+  
+  # Check out new branch
+  new_branch <- make_shinyppg_branch_name(user_id)
+
+  gert::git_branch_create(
+      branch = new_branch,
+      checkout = TRUE,
+      repo = ppg_repo
+  )
+}
+
+#' Load an existing session (ie, checkout an existing branch)
+#'
+#' @param session_summary Dataframe with branch names; output of
+#'   summarize_branches()
+#' @param selected_row Index of row with branch to checkout
+#' @noRd
+#' @autoglobal
+load_existing_session <- function(
+    session_summary,
+    selected_row,
+    ppg_repo = "/home/shiny/ppg") {
+  
+  assertthat::assert_that(
+    assertthat::is.number(selected_row)
+  )
+
+  # fetch has already been run by summarize_branches()
+
+  # checkout selected branch
+  selected_branch <- session_summary$branch[selected_row]
+  gert::git_branch_checkout(
+    branch = selected_branch,
+    force = TRUE,
+    repo = ppg_repo
+  )
+}
+
 #' Submit changes to GitHub
 #' @noRd
 #' @autoglobal
@@ -150,43 +202,14 @@ submit_changes <- function(
     ppg, ppg_path = "/home/shiny/ppg/data/ppg.csv",
     ppg_repo = "/home/shiny/ppg",
     user_name, user_id, title, summary, dry_run = FALSE) {
-  # Always write out in sci name alphabetic order
-  ppg <- dplyr::arrange(ppg, scientificName, taxonID)
-
-  # Switch back to main when done
-  on.exit(
-    gert::git_branch_checkout(
-      "main",
-      repo = ppg_repo
-    )
-  )
 
   # Define paths
   ppg_rel_path <- fs::path_rel(ppg_path, ppg_repo)
 
-  # Check out new branch
-  shinyppg_branch <- make_shinyppg_branch_name(user_id)
-
-  branch_already_exists <- gert::git_branch_exists(
-    shinyppg_branch,
-    local = TRUE, repo = ppg_repo
-  )
-
-  if (!branch_already_exists) {
-    gert::git_branch_create(
-      shinyppg_branch,
-      checkout = TRUE,
-      repo = ppg_repo
-    )
-  } else {
-    gert::git_branch_checkout(
-      shinyppg_branch,
-      repo = ppg_repo
-    )
-  }
-
   # Write out updated ppg file
-  readr::write_csv(ppg, ppg_path)
+  # Always write out in sci name alphabetic order
+  dplyr::arrange(ppg, scientificName, taxonID) |>
+    readr::write_csv(ppg_path)
 
   # Stage file for pushing
   ppg_staged <- gert::git_add(ppg_rel_path, repo = ppg_repo) |>
@@ -211,8 +234,7 @@ submit_changes <- function(
   # Push branch
   if (dry_run) {
     message("Everything looks good, resetting repo now")
-    gert::git_branch_checkout("main", repo = ppg_repo)
-    gert::git_branch_delete(shinyppg_branch, repo = ppg_repo)
+    gert::git_reset_hard(ref = "HEAD~1", repo = ppg_repo)
     return(invisible())
   }
 
