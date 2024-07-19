@@ -1,9 +1,33 @@
+#' Text input with limited width
+#' see https://github.com/rstudio/shiny/issues/3305#issuecomment-1407028520
+#' @noRd
+#' @autoglobal
+textInput2 <- function(inputId, label, value = "", width = NULL,
+                       placeholder = NULL, maxlength = NULL) {
+  tag <- shiny::textInput(
+    inputId = inputId,
+    label = label,
+    value = value,
+    width = width,
+    placeholder = placeholder
+  )
+
+  if (!is.null(maxlength)) {
+    htmltools::tagQuery(tag)$
+      children("input")$
+      addAttrs(maxlength = maxlength)$
+      allTags()
+  } else {
+    tag
+  }
+}
+
 #' UI for syncing
 #' @autoglobal
 #' @noRd
 sync_ui <- function(id) {
   tagList(
-    textAreaInput(NS(id, "title"), "Session title"),
+    textInput2(NS(id, "title"), "Session title", maxlength = 50),
     textAreaInput(NS(id, "summary"), "Summary of changes"),
     actionButton(NS(id, "push"), "Push Branch")
   )
@@ -31,7 +55,6 @@ sync_server <- function(id, ppg, credentials, dry_run = FALSE) {
     })
   })
 }
-
 
 #' Demo app for syncing
 #' @autoglobal
