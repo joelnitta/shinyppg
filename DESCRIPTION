@@ -19,7 +19,7 @@ Imports:
     daff,
     dplyr,
     DT,
-    dwctaxon (>= 2.0.3.9000),
+    dwctaxon (>= 2.0.3.9001),
     fs,
     gert,
     glue,
