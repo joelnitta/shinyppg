@@ -24,7 +24,20 @@ ppg_app <- function() {
   )
 
   server <- function(input, output, session) {
-    # Load data from repo (must be running from docker container)
+
+  # Define validation settings
+    dwctaxon::dct_options(
+      check_sci_name = FALSE,
+      check_mapping_accepted_status = TRUE,
+      check_mapping_parent_accepted = TRUE,
+      remap_parent = TRUE,
+      valid_tax_status = paste(valid_tax_status, collapse = ", "),
+      stamp_modified_by = TRUE,
+      stamp_modified_by_id = TRUE,
+      extra_cols = c("ipniURL", "modifiedBy", "modifiedByID")
+    )
+
+    # Load data
     higher_names <- load_pterido_higher_names()
     epithets <- load_pterido_sp_epithets()
     ipni_authors <- load_authors()
