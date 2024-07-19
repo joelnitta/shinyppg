@@ -113,15 +113,19 @@ summarize_branches <- function(user_id, ppg_repo = "/home/shiny/ppg") {
   user_branches <- gert::git_branch_list(repo = ppg_repo) |>
     dplyr::filter(local == FALSE) |>
     dplyr::mutate(name = stringr::str_remove_all(name, "origin/")) |>
-    dplyr::filter(stringr::str_detect(name, user_branch_pattern)) |>
-    dplyr::pull(name)
+    dplyr::filter(stringr::str_detect(name, user_branch_pattern))
+
+  # Return an empty tibble if no matching branches
+  if (nrow(user_branches) == 0) {
+    return(tibble::tibble())
+  }
 
   # For each branch, get and parse latest commit
   purrr::map_df(
-    user_branches, ~ gert::git_log(ref = ., repo = ppg_repo, max = 1)
+    user_branches$ref, ~ gert::git_log(ref = ., repo = ppg_repo, max = 1)
   ) |>
     dplyr::mutate(
-      branch = user_branches,
+      branch = user_branches$name,
       session_title = extract_session_title(message),
       session_summary = extract_session_summary(message),
     ) |>
