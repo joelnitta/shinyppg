@@ -642,3 +642,20 @@ linkize_urls <- function(ppg, url_cols) {
   ppg |>
     dplyr::mutate(dplyr::across(dplyr::all_of(url_cols), linkize_url_col))
 }
+
+#' Make an empty version of PPG
+#'
+#' Internal function
+#'
+#' @param default_ppg_cols **All** of the columns in the actual PPG
+#'   tibble, in correct order
+#' @return An empty PPG tibble, to show on startup (before a new session
+#'   is started)
+#' @noRd
+#' @autoglobal
+make_empty_ppg <- function(default_ppg_cols) {
+  tibble::tibble(default_ppg_cols) |>
+    dplyr::mutate(value = "a") |>
+    tidyr::pivot_wider(names_from = 1, values_from = value) %>%
+    dplyr::filter(FALSE)
+}
