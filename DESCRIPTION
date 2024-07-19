@@ -33,6 +33,7 @@ Imports:
     shinyauthr,
     shinyjs,
     stringr,
+    tidyr,
     tidyselect
 Depends: 
     R (>= 2.10)

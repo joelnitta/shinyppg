@@ -25,12 +25,12 @@ ppg_app <- function() {
 
   server <- function(input, output, session) {
     # Load data from repo (must be running from docker container)
-    ppg <- load_data_server("ppg", "repo")
     higher_names <- load_pterido_higher_names()
     epithets <- load_pterido_sp_epithets()
     ipni_authors <- load_authors()
 
     # Set initial values
+    ppg <- reactiveVal(make_empty_ppg(cols_select))
     composed_name_add <- reactiveVal("")
     composed_name_modify <- reactiveVal("")
     show_advanced <- reactiveVal(FALSE)

@@ -17,6 +17,7 @@ utils::globalVariables(c(
   "taxonID", # <fetch_children>
   "scientificName", # <subset_to_taxon_single>
   "taxonID", # <subset_to_taxon_single>
+  "value", # <make_empty_ppg>
   "name", # <summarize_branches>
   "branch", # <summarize_branches>
   "session_title", # <summarize_branches>
