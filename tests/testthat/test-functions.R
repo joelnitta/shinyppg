@@ -25,9 +25,9 @@ test_that("undo works", {
   ppg <- ppg_small
   ppg_mod_1 <- ppg |>
     dwctaxon::dct_modify_row(
-      scientificName = "Loxogramme antrophyoides (Baker) C. Chr.",
+      scientificName = "Loxogramme antrophyoides (Baker) C.Chr.",
       taxonomicStatus = "synonym",
-      parentNameUsage = "Cyathea meridensis H. Karst."
+      parentNameUsage = "Cyathea meridensis H.Karst."
     )
   save_patch(ppg, ppg_mod_1)
   ppg_mod_2 <- ppg_mod_1 |>
@@ -49,7 +49,7 @@ test_that("subsetting to taxonomic group works on single taxon", {
   expect_no_error(
     dct_validate(
       crep_data,
-      extra_cols = c("modifiedBy", "modifiedByID")
+      extra_cols = c("modifiedBy", "modifiedByID", "ipniURL")
     )
   )
 })
@@ -58,14 +58,14 @@ test_that("subsetting to taxonomic group works on multiple taxa", {
   sub_data <- subset_to_taxon(
     ppg_small, c(
       "Crepidomanes (C. Presl) C. Presl",
-      "Abrodictyum C. Presl"
+      "Abrodictyum C.Presl"
     )
   )
   expect_snapshot(sub_data)
   expect_no_error(
     dct_validate(
       sub_data,
-      extra_cols = c("modifiedBy", "modifiedByID"),
+      extra_cols = c("modifiedBy", "modifiedByID", "ipniURL"),
       on_success = "logical"
     )
   )
