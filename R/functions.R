@@ -656,6 +656,6 @@ linkize_urls <- function(ppg, url_cols) {
 make_empty_ppg <- function(default_ppg_cols) {
   tibble::tibble(default_ppg_cols) |>
     dplyr::mutate(value = "a") |>
-    tidyr::pivot_wider(names_from = 1, values_from = value) %>%
+    tidyr::pivot_wider(names_from = 1, values_from = value) |>
     dplyr::filter(FALSE)
 }
