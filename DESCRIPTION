@@ -23,6 +23,7 @@ Imports:
     fs,
     gert,
     glue,
+    htmltools,
     pkgload,
     purrr,
     reactable,
