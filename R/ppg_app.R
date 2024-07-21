@@ -119,7 +119,9 @@ ppg_app <- function() {
         ),
         tabPanel(
           "User Guide",
-          htmltools::includeMarkdown("doc.md")
+          htmltools::includeMarkdown(
+            system.file("doc.md", package = "shinyppg")
+          )
         )
       )
     })
