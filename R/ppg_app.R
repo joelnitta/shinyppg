@@ -25,7 +25,7 @@ ppg_app <- function() {
 
   server <- function(input, output, session) {
 
-  # Define validation settings
+    # Define validation settings
     dwctaxon::dct_options(
       check_sci_name = FALSE,
       check_mapping_accepted_status = TRUE,
@@ -78,16 +78,16 @@ ppg_app <- function() {
             sidebarPanel(
               tabsetPanel(
                 tabPanel(
-                  "Add row",
+                  "Add Row",
                   compose_name_ui("sci_name_add"),
-                  data_entry_ui("add_row", "Add row"),
+                  data_entry_ui("add_row", "Add Row"),
                   hr(),
                   delete_row_ui("delete_row"),
                   hr(),
                   undo_ui("undo")
                 ),
                 tabPanel(
-                  "Edit row",
+                  "Modify Row",
                   compose_name_ui("sci_name_modify"),
                   data_entry_ui("modify_row", "Modify row"),
                   hr(),
@@ -96,7 +96,7 @@ ppg_app <- function() {
                   undo_ui("undo")
                 ),
                 tabPanel(
-                  "Subset data",
+                  "Subset Data",
                   subset_ui("subset")
                 )
               ),
@@ -116,6 +116,10 @@ ppg_app <- function() {
         tabPanel(
           "Settings",
           settings_ui("settings")
+        ),
+        tabPanel(
+          "User Guide",
+          htmltools::includeMarkdown("doc.md")
         )
       )
     })

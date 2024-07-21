@@ -24,6 +24,7 @@ Imports:
     gert,
     glue,
     htmltools,
+    markdown,
     pkgload,
     purrr,
     reactable,
